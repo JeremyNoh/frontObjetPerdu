@@ -1,8 +1,11 @@
+// @flow
+
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { StackNavigator, TabNavigator, TabBarBottom  } from 'react-navigation';
-console.disableYellowBox = true ;
+ console.disableYellowBox = true ;
 import  HomeScreen  from './screens/home';
+
 
 
 
@@ -14,8 +17,8 @@ const RootStack = StackNavigator(
        },
     },
 );
-
-export default class App extends React.Component {
+type Props = {};
+export default class App extends React.Component <Props>{
   render() {
     return (
       <RootStack />

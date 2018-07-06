@@ -31,6 +31,7 @@ class HomeScreen extends React.Component {
       },
     };
   };
+
   // Fin navigationOptions
 
 render() {
