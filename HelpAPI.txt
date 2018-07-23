@@ -1,0 +1,23 @@
+Concernant les address de l'api :
+https://objetperduv2.herokuapp.com/api/
+/lost_object/
+/lost_object/? ( pour les params en query il y a : sid ( station id), tid, ( typeid), nid (nature id), did ( date id )
+
+/lost_object/stations => list all stations
+/lost_object/station/id => info sur une station
+
+/lost_object/types => list all type
+/lost_object/type/id => info sur un type
+
+/lost_object/natures => list all nature
+/lost_object/nature/id => info sur un nature
+
+/lost_object/dates => list all dates
+/lost_object/date/id => info sur une date
+
+/user
+/user/id => info sur un user
+/user/id/alert => get les alert d'un user
+/user/id/alert => post une alert ( Not dev)
+/user/:userid/alert/:alertid => get les infos une alert d'un user
+/user/:userid/alert/:alertid => delete une alert d'un user

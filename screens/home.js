@@ -12,10 +12,11 @@ import {
   TextInput,
 } from "react-native";
 
-import {Text , Button} from 'react-native-elements'
-import ville from '../assets/ville.json'
+import {Text , Button, Card} from 'react-native-elements'
+
+// import ville from '../assets/ville.json'
 import typeObjet from '../assets/typeObjet.json'
-import natureObjet from '../assets/natureObjet.json'
+// import natureObjet from '../assets/natureObjet.json'
 
 import MultiSelect from 'react-native-multiple-select';
 // import { Dropdown } from 'react-native-material-dropdown';
@@ -24,32 +25,68 @@ class HomeScreen extends React.Component {
   constructor(){
     super()
     this.state = {
-      ville: [],
-      typeObject: [],
-      natureObject: [],
 
+      isVille : false,
+      isAffine : false,
+      isCard : true,
     }
   }
+  componentWillMount() {
+    fetch("https://objetperduv2.herokuapp.com/api/lost_object/stations")
+      .then(response => response.json())
+      .then(responseJson => {
+         station = []
+        for (OneStation of responseJson.station) {
+          villeOne= {}
+          villeOne.id  = OneStation.id
+          villeOne.name  = OneStation.stationName
+          station.push(villeOne)
+        }
+        this.setState({ station : station})
+      })
+      .catch(error => {
+        console.error(error);
+      });
 
-  onVilleChange = (ville) => {
-    this.setState({ ville });
-  }
+      fetch("https://objetperduv2.herokuapp.com/api/lost_object/natures")
+        .then(response => response.json())
+        .then(responseJson => {
+           natureObject = []
+          for (OneNatureObject of responseJson.nature) {
+            natureOne= {}
+            natureOne.id  = OneNatureObject.id
+            natureOne.name  = OneNatureObject.natureObject
+            natureObject.push(natureOne)
+          }
+          this.setState({ natureObject})
+        })
+        .catch(error => {
+          console.error(error);
+        });
 
-  onTypeChange = (typeObject) => {
-    this.setState({ typeObject });
-  }
+        fetch("https://objetperduv2.herokuapp.com/api/lost_object/types")
+          .then(response => response.json())
+          .then(responseJson => {
+             typeObject = []
+            for (OnetypeObject of responseJson.type) {
+              typeOne= {}
+              typeOne.id  = OnetypeObject.id
+              typeOne.name  = OnetypeObject.typeObject
+              typeObject.push(typeOne)
+            }
+            this.setState({ typeObject})
+          })
+          .catch(error => {
+            console.error(error);
+          });
 
-  onNatureChange = (natureObject) => {
-    this.setState({ natureObject });
-  }
+    }
 
-  submit() {
-    console.log("get");
-  }
 
 
   // Debut navigationOptions
   static navigationOptions = ({ navigation }) => {
+    const { state, setParams, navigate } = navigation;
 
     return {
       headerTitle: "ObjetPerdu",
@@ -63,23 +100,144 @@ class HomeScreen extends React.Component {
   };
   // Fin navigationOptions
 
-  // villeView = () => {
-  //
-  // }
+  onVilleChange = (stationChoice) => {
+    this.setState({ stationChoice});
+  }
+
+  onTypeChange = (typeChoice) => {
+    this.setState({ typeChoice, isAffine : true });
+  }
+
+  onNatureChange = (natureChoice) => {
+    this.setState({ natureChoice, isVille : true });
+
+  }
+
+  submit() {
+
+    var data =  {}
+    data.test = "dededed"
+
+    if (!(this.state.stationChoice === undefined)) {
+      data.stationChoice = this.state.stationChoice
+    }
+    // if (!(this.state.typeObject === undefined)) {
+    //   data.typeObject = this.state.typeObject
+    // }
+    // if (!(this.state.natureChoice === undefined)) {
+    //   data.natureChoice = this.state.natureChoice
+    // }
+    this.props.navigation.navigate("list" , data);
+    console.log('get');
+  }
+
+  villeView = () => {
+  return (
+           <View >
+           <Card
+           key= {3}
+           title ="Etape 3 : Renseigne ta ville"
+           >
+             <MultiSelect
+               hideTags
+               items={this.state.station}
+               uniqueKey= "name"
+               ref={(component) => { this.multiSelect = component }}
+               onSelectedItemsChange={this.onVilleChange}
+               selectedItems={this.state.stationChoice}
+               selectText="Choisi ton endroit "
+               searchInputPlaceholderText="Recherche le nom de ta gare"
+               onChangeInput={ (text)=> console.log(text)}
+               tagBorderColor="#CCC"
+               tagTextColor="#CCC"
+               selectedItemTextColor="#CCC"
+               itemTextColor="#000"
+               single={true}
+               searchInputStyle={{ color: '#CCC' }}
+             />
+             </Card>
+
+             </View>
+  )
+  }
+
+  affineView = () => {
+    return(
+
+      <View style={styles.conter}>
+      <Card
+      key= {2}
+      title = 'Etape 2 :Affine ta recherche'
+      >
+        <MultiSelect
+          hideTags
+          items={this.state.natureObject}
+          uniqueKey="name"
+          ref={(component) => { this.multiSelect = component }}
+          onSelectedItemsChange={this.onNatureChange}
+          selectedItems={this.state.natureChoice}
+          selectText="Decrit ton object   "
+          searchInputPlaceholderText="Recherche le nom de ta gare"
+          onChangeInput={ (text)=> console.log(text)}
+          tagBorderColor="#CCC"
+          tagTextColor="#CCC"
+          selectedItemTextColor="#CCC"
+          itemTextColor="#000"
+          single={true}
+          searchInputStyle={{ color: '#CCC' }}
+        />
+        </Card>
+      </View>
+
+
+    )
+  }
+
+
+  closeCard( ){
+    this.setState({isCard : false})
+  }
+
+  card = () => {
+    return (
+      <Card
+      key= {5}
+      containerStyle ={styles.cardTitle}
+      dividerStyle={styles.cardTitle}
+         title='Bonjour '
+         >
+         <Text style={{marginBottom: 10}}>
+         Le but de cette appli , est de retrouver ton objet
+         que tu as perdu dans une gare SNCF
+         </Text>
+         <Button
+           backgroundColor='#03A9F4'
+           buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
+           title="J'ai Compris !"
+           onPress={ () => this.closeCard() }/>
+       </Card>
+    )
+  }
+  // <Text h5 style={styles.title}>Etape 1 : Type d'objet perdu ? </Text>
 
 
   render() {
      return (
        <View style={styles.container}>
-       <Text h3 style={styles.title}>Etape 1 : Type d'objet perdu ? </Text>
 
+       {this.state.isCard  && this.card()}
+              <ScrollView>
+       <Card
+       key= {1}
+       title="Etape 1 : Type d'objet perdu ?"
+       >
        <MultiSelect
          hideTags
-         items={typeObjet}
+         items={this.state.typeObject}
          uniqueKey="name"
          ref={(component) => { this.multiSelect = component }}
          onSelectedItemsChange={this.onTypeChange}
-         selectedItems={this.state.typeObject}
+         selectedItems={this.state.typeChoice}
          selectText="Choisi ton type d'objet"
          searchInputPlaceholderText="Search Items..."
          onChangeInput={ (text)=> console.log(text)}
@@ -90,55 +248,18 @@ class HomeScreen extends React.Component {
          single={true}
          searchInputStyle={{ color: '#CCC' }}
        />
+       </Card>
 
-       <View style={styles.conter1}>
-       <Text h3 style={styles.title}>Etape 2 : Renseigne ta ville </Text>
-         <MultiSelect
-           hideTags
-           items={ville}
-           uniqueKey="name"
-           ref={(component) => { this.multiSelect = component }}
-           onSelectedItemsChange={this.onVilleChange}
-           selectedItems={this.state.ville}
-           selectText="Choisi ton endroit "
-           searchInputPlaceholderText="Recherche le nom de ta gare"
-           onChangeInput={ (text)=> console.log(text)}
-           tagBorderColor="#CCC"
-           tagTextColor="#CCC"
-           selectedItemTextColor="#CCC"
-           itemTextColor="#000"
-           single={true}
-           searchInputStyle={{ color: '#CCC' }}
-         />
-         </View>
-
-         <View style={styles.conter2}>
-         <Text h3 style={styles.title}>Etape 3 :Affine ta recherche </Text>
-           <MultiSelect
-             hideTags
-             items={natureObjet}
-             uniqueKey="name"
-             ref={(component) => { this.multiSelect = component }}
-             onSelectedItemsChange={this.onNatureChange}
-             selectedItems={this.state.natureObject}
-             selectText="Decrit ton object   "
-             searchInputPlaceholderText="Recherche le nom de ta gare"
-             onChangeInput={ (text)=> console.log(text)}
-             tagBorderColor="#CCC"
-             tagTextColor="#CCC"
-             selectedItemTextColor="#CCC"
-             itemTextColor="#000"
-             single={true}
-             searchInputStyle={{ color: '#CCC' }}
-           />
-           </View>
-           <Button
-             title="Rechercher"
-             titleStyle={{ fontWeight: "700" }}
-             buttonStyle={styles.buttonStyle}
-             containerStyle={{ marginTop: 20 }}
-             onPress={this.submit}
-           />
+       {this.state.isAffine && this.affineView()}
+       {this.state.isVille  && this.villeView()}
+       </ScrollView>
+       <Button
+         title="Rechercher"
+         titleStyle={{ fontWeight: "700" }}
+         buttonStyle={styles.buttonStyle}
+         containerStyle={{ marginTop: 20 }}
+         onPress={() => this.submit()}
+       />
        </View>
      );
    }
@@ -156,7 +277,7 @@ const styles = StyleSheet.create({
   title : {
     textAlign: "center",
     color : '#5C63D8',
-    textDecorationLine : "underline" ,
+    // textDecorationLine : "underline" ,
     paddingTop : 20,
     paddingBottom : 20 ,
   },
@@ -171,5 +292,9 @@ const styles = StyleSheet.create({
   marginTop: 50,
   borderRadius: 5
 },
+ cardTitle:{
+    backgroundColor: '#A6ACAF',
+    borderRadius: 5,
+ },
 
 });
