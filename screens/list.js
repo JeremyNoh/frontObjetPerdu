@@ -13,6 +13,8 @@ import {
 } from "react-native";
 
 import {Text , Button} from 'react-native-elements'
+import { Card, CardTitle, CardContent, CardAction, CardButton } from 'react-native-cards';
+
 
 
 
@@ -31,9 +33,60 @@ class ListScreen extends React.Component {
 
 
   componentWillMount() {
-    console.log("componentWillMount");
 
+    console.log("componentWillMount");
+    // recuperation des données de la page précédente
+    let data = this.props.navigation.state.params.data || {}
+    let query = this.props.navigation.state.params.query || "https://objetperduv2.herokuapp.com/api//lost_object/"
+    let natureObject  = this.props.navigation.state.params.natureObject || []
+    let station =  this.props.navigation.state.params.station || []
+    let typeObject = this.props.navigation.state.params.typeObject  || []
+    console.log(query);
+    this.setState({data, query, natureObject, station,typeObject })
   }
+
+  componentDidMount() {
+  console.log("componentDidMount");
+
+  // fetch de l'api pour recuperer les objet perdu en fonction des params
+  fetch(this.state.query)
+    .then(response => response.json())
+    .then(responseJson => {
+      let objeFound = []
+      for (objectOne of responseJson.found_object) {
+        objectFoundOne = {}
+        objectFoundOne.id = objectOne.id
+        objectFoundOne.date = objectOne.date
+
+        // modification de l'id station en mot
+        this.state.station.map( item => {
+          if (item.id == objectOne.station ) {
+            objectFoundOne.station = item.name
+          }
+        })
+
+        // modification de l'id type en mot
+        this.state.typeObject.map( item => {
+          if (item.id == objectOne.typeObject ) {
+            objectFoundOne.typeObject = item.name
+          }
+        })
+        // modification de l'id nature en mot
+        this.state.natureObject.map( item => {
+          if (item.id == objectOne.natureObject ) {
+            objectFoundOne.natureObject = item.name
+          }
+        })
+        objeFound.push(objectFoundOne)
+      }
+      // console.log(objeFound);
+      this.setState({ objeFound , isReady : true})
+
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
   // Debut navigationOptions
   static navigationOptions = ({ navigation }) => {
     const { state, setParams, navigate } = navigation;
@@ -49,13 +102,33 @@ class ListScreen extends React.Component {
   };
   // Fin navigationOptions
   // <Text h3 style={styles.title}>{this.state.data.test} </Text>
-
+  isReady() {
+    if (this.state.isReady) {
+      return (
+        <ScrollView>
+          {this.state.objeFound.map((item, index) => (
+            <Card key={index}>
+              <CardTitle subtitle={item.natureObject} />
+              <CardContent text={item.typeObject} />
+              <CardAction separator={true} inColumn={false}>
+                <CardButton
+                  onPress={() => {}}
+                  title="j'ajoute dans mon Panier"
+                  color="#E41E62"
+                />
+              </CardAction>
+            </Card>
+          ))}
+        </ScrollView>
+      );
+    }
+  }
 
   render() {
      return (
        <View style={styles.container}>
-       <Text h3 style={styles.title}>Voici vos resultats  </Text>
-       
+       <Text h3 style={styles.title}>Vous avez {this.state.isReady && this.state.objeFound.length} Resultats  </Text>
+       {this.isReady()}
        </View>
      );
    }

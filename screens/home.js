@@ -15,7 +15,7 @@ import {
 import {Text , Button, Card} from 'react-native-elements'
 
 // import ville from '../assets/ville.json'
-import typeObjet from '../assets/typeObjet.json'
+// import typeObjet from '../assets/typeObjet.json'
 // import natureObjet from '../assets/natureObjet.json'
 
 import MultiSelect from 'react-native-multiple-select';
@@ -31,6 +31,8 @@ class HomeScreen extends React.Component {
       isCard : true,
     }
   }
+
+  // fetch pour récupérer les 3 infos de recherche
   componentWillMount() {
     fetch("https://objetperduv2.herokuapp.com/api/lost_object/stations")
       .then(response => response.json())
@@ -100,34 +102,40 @@ class HomeScreen extends React.Component {
   };
   // Fin navigationOptions
 
+  // maj du state sur la station séléctionnée
   onVilleChange = (stationChoice) => {
     this.setState({ stationChoice});
   }
 
+  // maj du state sur le type d'objet séléctionné
   onTypeChange = (typeChoice) => {
     this.setState({ typeChoice, isAffine : true });
   }
 
+  // maj du state sur la nature d'objet séléctionnée
   onNatureChange = (natureChoice) => {
     this.setState({ natureChoice, isVille : true });
 
   }
-
+     // sid ( station id), tid, ( typeid), nid (nature id), did ( date id )
   submit() {
-
+    var query = "https://objetperduv2.herokuapp.com/api//lost_object/"
     var data =  {}
-    data.test = "dededed"
-
-    if (!(this.state.stationChoice === undefined)) {
-      data.stationChoice = this.state.stationChoice
+    if (!(this.state.typeChoice === undefined)) {
+      data.typeChoice = this.state.typeChoice[0]
+      query += `?tid=${this.state.typeChoice[0]}`
     }
-    // if (!(this.state.typeObject === undefined)) {
-    //   data.typeObject = this.state.typeObject
-    // }
-    // if (!(this.state.natureChoice === undefined)) {
-    //   data.natureChoice = this.state.natureChoice
-    // }
-    this.props.navigation.navigate("list" , data);
+    if (!(this.state.stationChoice === undefined)) {
+      data.stationChoice = this.state.stationChoice[0]
+      query += `&sid=${this.state.stationChoice[0]}`
+    }
+
+    if (!(this.state.natureChoice === undefined)) {
+      data.natureChoice = this.state.natureChoice[0]
+      query += `&nid=${this.state.natureChoice[0]}`
+    }
+    // console.log(query);
+    this.props.navigation.navigate("list" , {query, data,natureObject, station,typeObject});
     console.log('get');
   }
 
@@ -141,7 +149,7 @@ class HomeScreen extends React.Component {
              <MultiSelect
                hideTags
                items={this.state.station}
-               uniqueKey= "name"
+               uniqueKey= "id"
                ref={(component) => { this.multiSelect = component }}
                onSelectedItemsChange={this.onVilleChange}
                selectedItems={this.state.stationChoice}
@@ -172,7 +180,7 @@ class HomeScreen extends React.Component {
         <MultiSelect
           hideTags
           items={this.state.natureObject}
-          uniqueKey="name"
+          uniqueKey="id"
           ref={(component) => { this.multiSelect = component }}
           onSelectedItemsChange={this.onNatureChange}
           selectedItems={this.state.natureChoice}
@@ -224,7 +232,6 @@ class HomeScreen extends React.Component {
   render() {
      return (
        <View style={styles.container}>
-
        {this.state.isCard  && this.card()}
               <ScrollView>
        <Card
@@ -234,7 +241,7 @@ class HomeScreen extends React.Component {
        <MultiSelect
          hideTags
          items={this.state.typeObject}
-         uniqueKey="name"
+         uniqueKey="id"
          ref={(component) => { this.multiSelect = component }}
          onSelectedItemsChange={this.onTypeChange}
          selectedItems={this.state.typeChoice}
