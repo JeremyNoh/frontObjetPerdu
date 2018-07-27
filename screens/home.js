@@ -26,8 +26,9 @@ import {
 // import typeObjet from '../assets/typeObjet.json'
 // import natureObjet from '../assets/natureObjet.json'
 
-import MultiSelect from "react-native-multiple-select";
-// import { Dropdown } from 'react-native-material-dropdown';
+// import MultiSelect from "react-native-multiple-select";
+
+import MultiSelect from 'react-native-sectioned-multi-select';
 
 class HomeScreen extends React.Component {
   constructor() {
@@ -216,6 +217,7 @@ class HomeScreen extends React.Component {
             selectText="Choisi ta endroit "
             searchInputPlaceholderText="Recherche le nom de ta gare"
             onChangeInput={text => console.log(text)}
+            showCancelButton = {true}
             tagBorderColor="#CCC"
             tagTextColor="#CCC"
             selectedItemTextColor="#CCC"
@@ -245,6 +247,7 @@ class HomeScreen extends React.Component {
             selectText="Decrit ton object   "
             searchInputPlaceholderText="Recherche le nom de ta gare"
             onChangeInput={text => console.log(text)}
+            showCancelButton = {true}
             tagBorderColor="#CCC"
             tagTextColor="#CCC"
             selectedItemTextColor="#CCC"
@@ -315,6 +318,7 @@ class HomeScreen extends React.Component {
                     searchInputPlaceholderText="Search Items..."
                     onChangeInput={text => console.log(text)}
                     tagBorderColor="#CCC"
+                    showCancelButton = {true}
                     tagTextColor="#CCC"
                     selectedItemTextColor="#CCC"
                     itemTextColor="#000"
