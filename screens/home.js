@@ -26,6 +26,7 @@ import {
 // import ville from '../assets/ville.json'
 // import typeObjet from '../assets/typeObjet.json'
 // import natureObjet from '../assets/natureObjet.json'
+
 import MultiSelect from 'react-native-sectioned-multi-select';
 
 type Props = { /* ... */ };
@@ -55,6 +56,15 @@ class HomeScreen extends React.Component <Props, State> {
       isAffine: false,
       isCardInfo: true,
       page : 1,
+      station : [],
+      natureObject : [],
+      typeObject : [],
+      stationChoice: [],
+      typeChoice: [],
+      natureChoice: [],
+      newNatureObject: [],
+      isSearchReady : false,
+      objeFound : [] ,
     };
   }
 
@@ -127,13 +137,12 @@ class HomeScreen extends React.Component <Props, State> {
   // Fin navigationOptions
 
   // maj du state sur la station séléctionnée
-  onVilleChange = (stationChoice: number) => {
-    console.log(stationChoice);
+  onVilleChange = (stationChoice: [number]) => {
     this.setState({ stationChoice });
   };
 
   // maj du state sur le type d'objet séléctionné
-  onTypeChange = (typeChoice : number) => {
+  onTypeChange = (typeChoice : [number]) => {
     this.majNature(typeChoice[0]);
     this.setState({ typeChoice });
   };
