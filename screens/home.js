@@ -1,3 +1,4 @@
+// @flow
 import React from "react";
 import {
   Alert,
@@ -25,34 +26,51 @@ import {
 // import ville from '../assets/ville.json'
 // import typeObjet from '../assets/typeObjet.json'
 // import natureObjet from '../assets/natureObjet.json'
-
-// import MultiSelect from "react-native-multiple-select";
-
 import MultiSelect from 'react-native-sectioned-multi-select';
 
-class HomeScreen extends React.Component {
+type Props = { /* ... */ };
+
+type State = {
+  modalVisible: boolean,
+  isAffine: boolean,
+  isCardInfo: boolean,
+  page : number,
+  station : array ,
+  natureObject : array,
+  typeObject : array,
+  stationChoice: array,
+  typeChoice: array,
+  natureChoice: array,
+  newNatureObject: array,
+  isSearchReady : boolean,
+  objeFound : array
+};
+
+
+class HomeScreen extends React.Component <Props, State> {
   constructor() {
     super();
     this.state = {
       modalVisible: false,
       isAffine: false,
-      isCardInfo: true
+      isCardInfo: true,
+      page : 1,
     };
   }
 
   // fetch pour récupérer les 3 infos de recherche
-  componentWillMount() {
+  componentWillMount() : any {
     fetch("https://objetperduv2.herokuapp.com/api/lost_object/stations")
       .then(response => response.json())
       .then(responseJson => {
-        station = [];
-        for (OneStation of responseJson.station) {
-          villeOne = {};
+        var station : array = [];
+        for (var OneStation of responseJson.station) {
+          var villeOne = {};
           villeOne.id = OneStation.id;
           villeOne.name = OneStation.stationName;
           station.push(villeOne);
         }
-        this.setState({ station: station });
+        this.setState({ station });
       })
       .catch(error => {
         console.error(error);
@@ -61,9 +79,9 @@ class HomeScreen extends React.Component {
     fetch("https://objetperduv2.herokuapp.com/api/lost_object/natures")
       .then(response => response.json())
       .then(responseJson => {
-        natureObject = [];
-        for (OneNatureObject of responseJson.nature) {
-          natureOne = {};
+        var natureObject : array = [];
+        for (var OneNatureObject of responseJson.nature) {
+          var natureOne = {};
           natureOne.id = OneNatureObject.id;
           natureOne.name = OneNatureObject.natureObject;
           natureOne.idType = OneNatureObject.type_object_id;
@@ -78,9 +96,9 @@ class HomeScreen extends React.Component {
     fetch("https://objetperduv2.herokuapp.com/api/lost_object/types")
       .then(response => response.json())
       .then(responseJson => {
-        typeObject = [];
-        for (OnetypeObject of responseJson.type) {
-          typeOne = {};
+        var typeObject : array = [];
+        for (var OnetypeObject of responseJson.type) {
+          var typeOne = {};
           typeOne.id = OnetypeObject.id;
           typeOne.name = OnetypeObject.typeObject;
           typeObject.push(typeOne);
@@ -109,20 +127,21 @@ class HomeScreen extends React.Component {
   // Fin navigationOptions
 
   // maj du state sur la station séléctionnée
-  onVilleChange = stationChoice => {
+  onVilleChange = (stationChoice: number) => {
+    console.log(stationChoice);
     this.setState({ stationChoice });
   };
 
   // maj du state sur le type d'objet séléctionné
-  onTypeChange = typeChoice => {
+  onTypeChange = (typeChoice : number) => {
     this.majNature(typeChoice[0]);
     this.setState({ typeChoice });
   };
 
   // maj des natures d'objet pour afficher en fonction du type
-  majNature(numbertype) {
-    var newNatureObject = [];
-    for (obj of this.state.natureObject) {
+  majNature(numbertype : number |string ) {
+    var newNatureObject : array = [];
+    for (var obj of this.state.natureObject) {
       if (numbertype == obj.idType) {
         newNatureObject.push(obj);
       }
@@ -131,12 +150,12 @@ class HomeScreen extends React.Component {
   }
 
   // maj du state sur la nature d'objet séléctionnée
-  onNatureChange = natureChoice => {
+  onNatureChange = (natureChoice: number) => {
     this.setState({ natureChoice });
   };
   // sid ( station id), tid, ( typeid), nid (nature id), did ( date id )
   submit() {
-    var query = "https://objetperduv2.herokuapp.com/api/lost_object/page=1/";
+    var query : string = `https://objetperduv2.herokuapp.com/api/lost_object/page=${this.state.page}/`
     var data = {};
     if (!(this.state.typeChoice === undefined)) {
       data.typeChoice = this.state.typeChoice[0];
@@ -160,14 +179,14 @@ class HomeScreen extends React.Component {
   }
 
   // fetch les objet Perdu en fonction des params de la query
-  fetchResult(query) {
+  fetchResult(query : string) {
     console.log(query);
     fetch(query)
       .then(response => response.json())
       .then(responseJson => {
-        let objeFound = [];
-        for (objectOne of responseJson.found_object) {
-          objectFoundOne = {};
+        let objeFound : array = [];
+        for (var objectOne of responseJson.found_object) {
+          var objectFoundOne = {};
           objectFoundOne.id = objectOne.id;
           objectFoundOne.date = objectOne.date;
 
@@ -192,7 +211,6 @@ class HomeScreen extends React.Component {
           });
           objeFound.push(objectFoundOne);
         }
-        // console.log(objeFound);
         this.setState({ objeFound, isSearchReady: true });
       })
       .catch(error => {
@@ -214,7 +232,7 @@ class HomeScreen extends React.Component {
             }}
             onSelectedItemsChange={this.onVilleChange}
             selectedItems={this.state.stationChoice}
-            selectText="Choisi ta endroit "
+            selectText="Recherche Une gare SNCF "
             searchInputPlaceholderText="Recherche le nom de ta gare"
             onChangeInput={text => console.log(text)}
             showCancelButton = {true}
@@ -353,12 +371,16 @@ class HomeScreen extends React.Component {
     );
   }
 
-  ListObjFound() {
+  ListObjFound() : any{
     if (this.state.isSearchReady) {
       return (
         // <View>
         // <Text h3 style={styles.titleSearch}>Vous avez {this.state.objeFound.length || 0} Resultats  </Text>
-        <ScrollView>
+        <ScrollView
+        pagingEnabled={true}
+        onMomentumScrollEnd ={() => this.nextPage()}
+
+        >
           {this.state.objeFound.map((item, index) => (
             <Card key={index}>
               <CardTitle subtitle={item.natureObject} />
@@ -378,12 +400,28 @@ class HomeScreen extends React.Component {
     }
   }
 
+  nextPage () {
+    console.log("we are at the end ");
+    // return(
+    //   <Button
+    //     title="Page suivante"
+    //     titleStyle={{ fontWeight: "700" }}
+    //     containerStyle={{ marginTop: 20 }}
+    //     onPress={() => {
+    //       this.setState({page : this.state.page +1});
+    //     }}
+    //   />
+    // )
+
+  }
+
   render() {
     return (
       <View style={styles.container}>
         {this.state.isCardInfo && this.cardInfo()}
         {this.modal()}
         {this.state.isSearchReady && this.ListObjFound()}
+        {this.state.isSearchReady && this.nextPage()}
       </View>
     );
   }
