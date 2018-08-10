@@ -15,7 +15,7 @@ import {
   TextInput
 } from "react-native";
 
-import { Text, Button, Card } from "react-native-elements";
+import { Text, Button, Card ,Badge} from "react-native-elements";
 import {
   CardTitle,
   CardContent,
@@ -27,53 +27,59 @@ import {
 // import typeObjet from '../assets/typeObjet.json'
 // import natureObjet from '../assets/natureObjet.json'
 
-import MultiSelect from 'react-native-sectioned-multi-select';
+import MultiSelect from "react-native-sectioned-multi-select";
 
-type Props = { /* ... */ };
+type Props = {
+  /* ... */
+};
 
 type State = {
   modalVisible: boolean,
   isAffine: boolean,
   isCardInfo: boolean,
-  page : number,
-  station : array ,
-  natureObject : array,
-  typeObject : array,
+  page: number,
+  station: array,
+  natureObject: array,
+  typeObject: array,
   stationChoice: array,
   typeChoice: array,
   natureChoice: array,
   newNatureObject: array,
-  isSearchReady : boolean,
-  objeFound : array
+  isSearchReady: boolean,
+  objeFound: array,
+  PageMax: number,
+  nbrObj: number
 };
 
-
-class HomeScreen extends React.Component <Props, State> {
+class HomeScreen extends React.Component<Props, State> {
   constructor() {
     super();
     this.state = {
       modalVisible: false,
       isAffine: false,
       isCardInfo: true,
-      page : 1,
-      station : [],
-      natureObject : [],
-      typeObject : [],
-      stationChoice: [],
-      typeChoice: [],
-      natureChoice: [],
+      page: 1,
+      station: [],
+      natureObject: [],
+      typeObject: [],
+      stationChoice: undefined,
+      typeChoice: undefined,
+      natureChoice: undefined,
       newNatureObject: [],
-      isSearchReady : false,
-      objeFound : [] ,
+      isSearchReady: false,
+      objeFound: [],
+      PageMax: undefined,
+      nbrObj: undefined
     };
   }
 
   // fetch pour récupérer les 3 infos de recherche
-  componentWillMount() : any {
+  componentWillMount(): any {
+    console.log("start");
     fetch("https://objetperduv2.herokuapp.com/api/lost_object/stations")
       .then(response => response.json())
       .then(responseJson => {
-        var station : array = [];
+        var station: array = [];
         for (var OneStation of responseJson.station) {
           var villeOne = {};
           villeOne.id = OneStation.id;
@@ -89,7 +95,7 @@ class HomeScreen extends React.Component <Props, State> {
     fetch("https://objetperduv2.herokuapp.com/api/lost_object/natures")
       .then(response => response.json())
       .then(responseJson => {
-        var natureObject : array = [];
+        var natureObject: array = [];
         for (var OneNatureObject of responseJson.nature) {
           var natureOne = {};
           natureOne.id = OneNatureObject.id;
@@ -106,7 +112,7 @@ class HomeScreen extends React.Component <Props, State> {
     fetch("https://objetperduv2.herokuapp.com/api/lost_object/types")
       .then(response => response.json())
       .then(responseJson => {
-        var typeObject : array = [];
+        var typeObject: array = [];
         for (var OnetypeObject of responseJson.type) {
           var typeOne = {};
           typeOne.id = OnetypeObject.id;
@@ -142,14 +148,14 @@ class HomeScreen extends React.Component <Props, State> {
   };
 
   // maj du state sur le type d'objet séléctionné
-  onTypeChange = (typeChoice : [number]) => {
+  onTypeChange = (typeChoice: [number]) => {
     this.majNature(typeChoice[0]);
     this.setState({ typeChoice });
   };
 
   // maj des natures d'objet pour afficher en fonction du type
-  majNature(numbertype : number |string ) {
-    var newNatureObject : array = [];
+  majNature(numbertype: number | string) {
+    var newNatureObject: array = [];
     for (var obj of this.state.natureObject) {
       if (numbertype == obj.idType) {
         newNatureObject.push(obj);
@@ -164,20 +170,39 @@ class HomeScreen extends React.Component <Props, State> {
   };
   // sid ( station id), tid, ( typeid), nid (nature id), did ( date id )
   submit() {
-    var query : string = `https://objetperduv2.herokuapp.com/api/lost_object/page=${this.state.page}/`
+    var query: string = `https://objetperduv2.herokuapp.com/api/lost_object/page=${
+      this.state.page
+    }/`;
     var data = {};
-    if (!(this.state.typeChoice === undefined)) {
+
+    if (!(this.state.typeChoice == undefined)) {
       data.typeChoice = this.state.typeChoice[0];
-      query += `?tid=${this.state.typeChoice[0]}`;
+      if (this.firstParams(query)) {
+        query += `?tid=${this.state.typeChoice[0]}`;
+      }
+      else {
+        query += `&tid=${this.state.typeChoice[0]}`;
+      }
+
     }
-    if (!(this.state.stationChoice === undefined)) {
+    if (!(this.state.stationChoice == undefined)) {
       data.stationChoice = this.state.stationChoice[0];
-      query += `&sid=${this.state.stationChoice[0]}`;
+      if (this.firstParams(query)) {
+        query += `?sid=${this.state.stationChoice[0]}`;
+      }
+      else {
+        query += `&sid=${this.state.stationChoice[0]}`;
+      }
     }
 
-    if (!(this.state.natureChoice === undefined)) {
+    if (!(this.state.natureChoice == undefined)) {
       data.natureChoice = this.state.natureChoice[0];
-      query += `&nid=${this.state.natureChoice[0]}`;
+      if (this.firstParams(query)) {
+        query += `?nid=${this.state.natureChoice[0]}`;
+      }
+      else {
+        query += `&nid=${this.state.natureChoice[0]}`;
+      }
     }
     // navigue sur la page des card , avec les params nécéssaires
     // this.props.navigation.navigate("list" , {query, data,natureObject, station,typeObject});
@@ -187,40 +212,61 @@ class HomeScreen extends React.Component <Props, State> {
     this.setModalVisible(!this.state.modalVisible);
   }
 
+// renvois un boolean pour savoir si c'est le first params sur la query
+  firstParams(query : string ) : boolean{
+    query = query.substr(query.length-1, 1)
+    if (query == "/") {
+      return true
+    }
+      else {
+        return false;
+      }
+  }
+
   // fetch les objet Perdu en fonction des params de la query
-  fetchResult(query : string) {
+  fetchResult(query: string) {
     console.log(query);
     fetch(query)
       .then(response => response.json())
       .then(responseJson => {
-        let objeFound : array = [];
-        for (var objectOne of responseJson.found_object) {
-          var objectFoundOne = {};
-          objectFoundOne.id = objectOne.id;
-          objectFoundOne.date = objectOne.date;
+        // gestion d'erreur si pas d'objet
+        if (responseJson.information) {
+          var PageMax: number = responseJson.information.pages;
+          var nbrObj: number = responseJson.information.objects;
+          let objeFound: array = [];
+          for (var objectOne of responseJson.found_object) {
+            var objectFoundOne = {};
+            objectFoundOne.id = objectOne.id;
+            objectFoundOne.date = objectOne.date;
 
-          // modification de l'id station en mot
-          this.state.station.map(item => {
-            if (item.id == objectOne.station) {
-              objectFoundOne.station = item.name;
-            }
-          });
+            // modification de l'id station en mot
+            this.state.station.map(item => {
+              if (item.id == objectOne.station) {
+                objectFoundOne.station = item.name;
+              }
+            });
 
-          // modification de l'id type en mot
-          this.state.typeObject.map(item => {
-            if (item.id == objectOne.typeObject) {
-              objectFoundOne.typeObject = item.name;
-            }
-          });
-          // modification de l'id nature en mot
-          this.state.natureObject.map(item => {
-            if (item.id == objectOne.natureObject) {
-              objectFoundOne.natureObject = item.name;
-            }
-          });
-          objeFound.push(objectFoundOne);
+            // modification de l'id type en mot
+            this.state.typeObject.map(item => {
+              if (item.id == objectOne.typeObject) {
+                objectFoundOne.typeObject = item.name;
+              }
+            });
+            // modification de l'id nature en mot
+            this.state.natureObject.map(item => {
+              if (item.id == objectOne.natureObject) {
+                objectFoundOne.natureObject = item.name;
+              }
+            });
+            objeFound.push(objectFoundOne);
+          }
+          this.setState({ objeFound, isSearchReady: true, PageMax, nbrObj });
+        } else {
+          // erreur connection ou autres
+          var objeFound : array = [];
+          this.setState({ objeFound, isSearchReady: true, PageMax : undefined, nbrObj: undefined });
+          console.log(responseJson.Error);
         }
-        this.setState({ objeFound, isSearchReady: true });
       })
       .catch(error => {
         console.error(error);
@@ -244,7 +290,7 @@ class HomeScreen extends React.Component <Props, State> {
             selectText="Recherche Une gare SNCF "
             searchInputPlaceholderText="Recherche le nom de ta gare"
             onChangeInput={text => console.log(text)}
-            showCancelButton = {true}
+            showCancelButton={true}
             tagBorderColor="#CCC"
             tagTextColor="#CCC"
             selectedItemTextColor="#CCC"
@@ -274,7 +320,7 @@ class HomeScreen extends React.Component <Props, State> {
             selectText="Decrit ton object   "
             searchInputPlaceholderText="Recherche le nom de ta gare"
             onChangeInput={text => console.log(text)}
-            showCancelButton = {true}
+            showCancelButton={true}
             tagBorderColor="#CCC"
             tagTextColor="#CCC"
             selectedItemTextColor="#CCC"
@@ -309,7 +355,9 @@ class HomeScreen extends React.Component <Props, State> {
             marginBottom: 0
           }}
           title="J'ai Compris !"
-          onPress={() => {this.setState({ isCardInfo: false })}}
+          onPress={() => {
+            this.setState({ isCardInfo: false });
+          }}
         />
       </Card>
     );
@@ -345,7 +393,7 @@ class HomeScreen extends React.Component <Props, State> {
                     searchInputPlaceholderText="Search Items..."
                     onChangeInput={text => console.log(text)}
                     tagBorderColor="#CCC"
-                    showCancelButton = {true}
+                    showCancelButton={true}
                     tagTextColor="#CCC"
                     selectedItemTextColor="#CCC"
                     itemTextColor="#000"
@@ -380,15 +428,14 @@ class HomeScreen extends React.Component <Props, State> {
     );
   }
 
-  ListObjFound() : any{
+  ListObjFound(): any {
     if (this.state.isSearchReady) {
       return (
         // <View>
         // <Text h3 style={styles.titleSearch}>Vous avez {this.state.objeFound.length || 0} Resultats  </Text>
         <ScrollView
-        pagingEnabled={true}
-        onMomentumScrollEnd ={() => this.nextPage()}
-
+          pagingEnabled={true}
+          onMomentumScrollEnd={() => this.nextPage()}
         >
           {this.state.objeFound.map((item, index) => (
             <Card key={index}>
@@ -409,7 +456,12 @@ class HomeScreen extends React.Component <Props, State> {
     }
   }
 
-  nextPage () {
+  nbrObjFound(){
+    return(
+      <Text h3 style={styles.titleSearch}>Vous avez {this.state.nbrObj} Resultats  </Text>
+    )
+  }
+  nextPage() {
     console.log("we are at the end ");
     // return(
     //   <Button
@@ -421,7 +473,6 @@ class HomeScreen extends React.Component <Props, State> {
     //     }}
     //   />
     // )
-
   }
 
   render() {
@@ -429,6 +480,7 @@ class HomeScreen extends React.Component <Props, State> {
       <View style={styles.container}>
         {this.state.isCardInfo && this.cardInfo()}
         {this.modal()}
+        {this.state.isSearchReady && this.nbrObjFound()}
         {this.state.isSearchReady && this.ListObjFound()}
         {this.state.isSearchReady && this.nextPage()}
       </View>
