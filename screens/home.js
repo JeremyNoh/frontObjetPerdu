@@ -23,10 +23,6 @@ import {
     CardButton
 } from "react-native-cards";
 
-// import ville from '../assets/ville.json'
-// import typeObjet from '../assets/typeObjet.json'
-// import natureObjet from '../assets/natureObjet.json'
-
 import MultiSelect from "react-native-sectioned-multi-select";
 
 type Props = {
@@ -76,7 +72,6 @@ class HomeScreen extends React.Component<Props, State> {
     // fetch pour récupérer les 3 infos de recherche
     componentWillMount(): any {
         console.log("start");
-        /*this.timeOut();*/
         fetch("https://objetperduv2.herokuapp.com/api/lost_object/stations")
             .then(response => response.json())
             .then(responseJson => {
@@ -87,6 +82,9 @@ class HomeScreen extends React.Component<Props, State> {
                     villeOne.name = OneStation.stationName;
                     station.push(villeOne);
                 }
+                station.sort(function (a, b) {
+                    return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);
+                });
                 this.setState({station});
             })
             .catch(error => {
@@ -122,7 +120,9 @@ class HomeScreen extends React.Component<Props, State> {
                     typeOne.name = OnetypeObject.typeObject;
                     typeObject.push(typeOne);
                 }
-                typeObject.sort();
+                typeObject.sort(function (a, b) {
+                    return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);
+                });
                 this.setState({typeObject});
             })
             .catch(error => {
@@ -165,6 +165,9 @@ class HomeScreen extends React.Component<Props, State> {
                 newNatureObject.push(obj);
             }
         }
+        newNatureObject.sort(function (a, b) {
+            return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);
+        });
         this.setState({isAffine: true, newNatureObject});
     }
 
@@ -282,7 +285,7 @@ class HomeScreen extends React.Component<Props, State> {
     villeView = () => {
         return (
             <View>
-                <Card key={3} title="Rechercher la Gare :">
+                <Card key={3} title="Gare SNCF :">
                     <MultiSelect
                         hideTags
                         items={this.state.station}
@@ -292,7 +295,7 @@ class HomeScreen extends React.Component<Props, State> {
                         }}
                         onSelectedItemsChange={this.onVilleChange}
                         selectedItems={this.state.stationChoice}
-                        selectText="Recherche Une gare SNCF "
+                        selectText="Recherche la gare SNCF"
                         searchInputPlaceholderText="Recherche le nom de ta gare"
                         onChangeInput={text => console.log(text)}
                         showCancelButton={true}
@@ -322,7 +325,7 @@ class HomeScreen extends React.Component<Props, State> {
                         }}
                         onSelectedItemsChange={this.onNatureChange}
                         selectedItems={this.state.natureChoice}
-                        selectText="Decrit ton object   "
+                        selectText="Décris ton objet"
                         searchInputPlaceholderText="Recherche le nom de ta gare"
                         onChangeInput={text => console.log(text)}
                         showCancelButton={true}
@@ -338,14 +341,6 @@ class HomeScreen extends React.Component<Props, State> {
         );
     };
 
-    /*timeOut = () => {
-        card = this.cardInfo();
-        card.style.display = "none";
-        setTimeout(card, 5000)
-    }*/
-
-
-
     // Card Info pour expliquer brièvement l'appli
     cardInfo = () => {
         return (
@@ -356,8 +351,10 @@ class HomeScreen extends React.Component<Props, State> {
                 title="Bonjour "
             >
                 <Text style={{marginBottom: 10}}>
-                    Le but de cette appli , est de retrouver ton objet que tu as perdu
-                    dans une gare SNCF
+                    Vous avez oublié un objet dans une gare SNCF et vous vous demandez comment le récupérer
+                    ? /* saut de ligne*/
+                    Plus besoin de vous déplacer ou de passer votre temps au téléphone, il vous suffit simplement de
+                    faire votre recherche grâce à cette application.
                 </Text>
                 <Button
                     backgroundColor="#03A9F4"
@@ -368,7 +365,7 @@ class HomeScreen extends React.Component<Props, State> {
                         marginBottom: 0
 
                     }}
-                    title="J'ai Compris !"
+                    title="J'ai compris !" /* */
                     onPress={() => {
                         this.setState({isCardInfo: false});
                     }}
@@ -393,7 +390,7 @@ class HomeScreen extends React.Component<Props, State> {
                     <View style={styles.modal}>
                         <View>
                             <ScrollView>
-                                <Card key={1} title=" Type d'objet perdu : ">
+                                <Card key={1} title=" Type d'objet : ">
                                     <MultiSelect
                                         hideTags
                                         items={this.state.typeObject}
@@ -431,10 +428,11 @@ class HomeScreen extends React.Component<Props, State> {
                 </Modal>
 
                 <Button
-                    title="Faire une recherche"
+                    title="Nouvelle recherche"
                     titleStyle={{fontWeight: "700"}}
                     containerStyle={{marginTop: 20}}
                     onPress={() => {
+                        this.setState({isCardInfo: false});
                         this.setModalVisible(true);
                     }}
                 />
@@ -473,7 +471,7 @@ class HomeScreen extends React.Component<Props, State> {
 
     nbrObjFound() {
         return (
-            <Text h3 style={styles.titleSearch}>Vous avez {this.state.nbrObj} Resultats </Text>
+            <Text h3 style={styles.titleSearch}>Vous avez {this.state.nbrObj} résultats </Text>
         )
     }
 
@@ -492,6 +490,9 @@ class HomeScreen extends React.Component<Props, State> {
     }
 
     render() {
+        /*setTimeout(() => {
+            this.setState({isCardInfo: false})
+        }, 7000)*/
         return (
             <View style={styles.container}>
                 {this.state.isCardInfo && this.cardInfo()}

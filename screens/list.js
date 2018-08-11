@@ -91,7 +91,7 @@ class ListScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     const { state, setParams, navigate } = navigation;
     return {
-      headerTitle: "ObjetPerdu",
+      headerTitle: "Objet perdu",
       headerStyle: {
         backgroundColor: "#A80C7C"
       },
