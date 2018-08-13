@@ -213,7 +213,6 @@ class HomeScreen extends React.Component<Props, State> {
             }
         }
         // navigue sur la page des card , avec les params nécéssaires
-        // this.props.navigation.navigate("list" , {query, data,natureObject, station,typeObject});
 
         // ferme le modal
         this.fetchResult(query);
@@ -239,8 +238,10 @@ class HomeScreen extends React.Component<Props, State> {
             .then(responseJson => {
                 // gestion d'erreur si pas d'objet
                 if (responseJson.information) {
-                    var PageMax: number = responseJson.information.pages;
-                    var nbrObj: number = responseJson.information.objects;
+                  var PageMax: number = 0
+                  var nbrObj: number = 0
+                  PageMax = responseJson.information.pages;
+                  nbrObj = responseJson.information.objects;
                     let objeFound: array = [];
                     for (var objectOne of responseJson.found_object) {
                         var objectFoundOne = {};
@@ -268,6 +269,8 @@ class HomeScreen extends React.Component<Props, State> {
                         });
                         objeFound.push(objectFoundOne);
                     }
+                    console.log("nombre de resultat : ",nbrObj);
+                    console.log("Page total : ", PageMax);
                     this.setState({objeFound, isSearchReady: true, PageMax, nbrObj});
                 } else {
                     // erreur connection ou autres
@@ -350,9 +353,11 @@ class HomeScreen extends React.Component<Props, State> {
                 dividerStyle={styles.cardTitle}
                 title="Bonjour "
             >
-                <Text style={{marginBottom: 10}}>
+                <Text style={{marginBottom: 5}}>
                     Vous avez oublié un objet dans une gare SNCF et vous vous demandez comment le récupérer
-                    ? /* saut de ligne*/
+                    ?
+                  </Text>
+                  <Text style={{marginBottom: 10}}>
                     Plus besoin de vous déplacer ou de passer votre temps au téléphone, il vous suffit simplement de
                     faire votre recherche grâce à cette application.
                 </Text>
@@ -490,9 +495,6 @@ class HomeScreen extends React.Component<Props, State> {
     }
 
     render() {
-        /*setTimeout(() => {
-            this.setState({isCardInfo: false})
-        }, 7000)*/
         return (
             <View style={styles.container}>
                 {this.state.isCardInfo && this.cardInfo()}

@@ -5,7 +5,6 @@ import { StyleSheet, Text, View } from 'react-native';
 import { StackNavigator, TabNavigator, TabBarBottom  } from 'react-navigation';
  console.disableYellowBox = true ;
 import  HomeScreen  from './screens/home';
-import  ListScreen  from './screens/list';
 
 
 
@@ -16,9 +15,6 @@ const RootStack = StackNavigator(
       home: {
            screen: HomeScreen,
        },
-       list: {
-            screen: ListScreen,
-        },
     },
 );
 type Props = {};
