@@ -24,6 +24,8 @@ import {
 } from "react-native-cards";
 
 import MultiSelect from "react-native-sectioned-multi-select";
+import Toast, {DURATION} from 'react-native-easy-toast'
+
 
 type Props = {
     /* ... */
@@ -56,7 +58,7 @@ class HomeScreen extends React.Component<Props, State> {
             isAffine: false,
             isStation : false,
             isCardInfo: true,
-            page: 1,
+            page: 0,
             station: [],
             natureObject: [],
             typeObject: [],
@@ -67,7 +69,7 @@ class HomeScreen extends React.Component<Props, State> {
             isSearchReady: false,
             objeFound: [],
             PageMax: undefined,
-            nbrObj: undefined
+            nbrObj: undefined,
         };
     }
 
@@ -181,9 +183,11 @@ class HomeScreen extends React.Component<Props, State> {
     // sid ( station id), tid, ( typeid), nid (nature id), did ( date id )
     submit() {
         var query: string = `https://objetperduv2.herokuapp.com/api/lost_object/page=${
-            this.state.page
+            this.state.page+1
             }/`;
         var data = {};
+        var page : number = this.state.page+1
+        this.setState({page})
 
         if (!(this.state.typeChoice == undefined)) {
             data.typeChoice = this.state.typeChoice[0];
@@ -218,7 +222,8 @@ class HomeScreen extends React.Component<Props, State> {
 
         // ferme le modal
         this.fetchResult(query);
-        this.setModalVisible(!this.state.modalVisible);
+
+        this.setModalVisible(false);
     }
 
 // renvois un boolean pour savoir si c'est le first params sur la query
@@ -238,13 +243,14 @@ class HomeScreen extends React.Component<Props, State> {
         fetch(query)
             .then(response => response.json())
             .then(responseJson => {
+
                 // gestion d'erreur si pas d'objet
                 if (responseJson.information) {
                   var PageMax: number = 0
                   var nbrObj: number = 0
                   PageMax = responseJson.information.pages;
                   nbrObj = responseJson.information.objects;
-                    let objeFound: array = [];
+                    let objeFound: array = this.state.objeFound;
                     for (var objectOne of responseJson.found_object) {
                         var objectFoundOne = {};
                         objectFoundOne.id = objectOne.id;
@@ -274,9 +280,15 @@ class HomeScreen extends React.Component<Props, State> {
                     console.log("nombre de resultat : ",nbrObj);
                     console.log("Page total : ", PageMax);
                     this.setState({objeFound, isSearchReady: true, PageMax, nbrObj});
+
+
                 } else {
                     // erreur connection ou autres
-                    console.log("il n'y a pas de resultats");
+
+                    this.refs.toast.show("il n'y a pas de resultats", 1500, () => {
+                       // something you want to do at close
+                   });
+
                     var objeFound: array = [];
                     this.setState({objeFound, isSearchReady: true, PageMax: 0, nbrObj: 0});
                     console.log(responseJson.Error);
@@ -285,6 +297,8 @@ class HomeScreen extends React.Component<Props, State> {
             .catch(error => {
                 console.error(error);
             });
+            // ferme le spinner
+             // loading.close();
     }
 
     // Card sur la Gare
@@ -429,7 +443,10 @@ class HomeScreen extends React.Component<Props, State> {
                                 titleStyle={{fontWeight: "700"}}
                                 buttonStyle={styles.buttonStyle}
                                 containerStyle={{marginTop: 20}}
-                                onPress={() => this.submit()}
+                                onPress={() => {
+                                  // loading.show();
+                                  this.submit();
+                              }}
                             />
                         </View>
                     </View>
@@ -440,7 +457,9 @@ class HomeScreen extends React.Component<Props, State> {
                     titleStyle={{fontWeight: "700"}}
                     containerStyle={{marginTop: 20}}
                     onPress={() => {
-                        this.setState({isCardInfo: false});
+                      var page : number  = 0 ;
+                      var objeFound : array = [];
+                        this.setState({isCardInfo: false ,page,objeFound });
                         this.setModalVisible(true);
                     }}
                 />
@@ -448,14 +467,19 @@ class HomeScreen extends React.Component<Props, State> {
         );
     }
 
+
     ListObjFound(): any {
         if (this.state.isSearchReady) {
             return (
-                // <View>
-                // <Text h3 style={styles.titleSearch}>Vous avez {this.state.objeFound.length || 0} Resultats  </Text>
                 <ScrollView
-                    pagingEnabled={true}
-                    onMomentumScrollEnd={() => this.nextPage()}
+                    onMomentumScrollEnd={(e)=>{
+                        var windowHeight = Dimensions.get('window').height,
+                            height = e.nativeEvent.contentSize.height,
+                            offset = e.nativeEvent.contentOffset.y;
+                        if( windowHeight + offset >= height ){
+                            this.nextPage()
+                        }
+                    }}
                 >
                     {this.state.objeFound.map((item, index) => (
                         <Card key={index}>
@@ -472,7 +496,6 @@ class HomeScreen extends React.Component<Props, State> {
                         </Card>
                     ))}
                 </ScrollView>
-                // </View>
             );
         }
     }
@@ -484,17 +507,20 @@ class HomeScreen extends React.Component<Props, State> {
     }
 
     nextPage() {
-        console.log("we are at the end ");
-        // return(
-        //   <Button
-        //     title="Page suivante"
-        //     titleStyle={{ fontWeight: "700" }}
-        //     containerStyle={{ marginTop: 20 }}
-        //     onPress={() => {
-        //       this.setState({page : this.state.page +1});
-        //     }}
-        //   />
-        // )
+      var page : number = this.state.page
+      page += 1
+      if (this.state.PageMax < page) {
+        this.refs.toast.show("il n'y a plus d'autre Objet revenez plus tard", 1500, () => {
+       // something you want to do at close
+   });
+      }
+      else {
+        // loading.show()
+        console.log("page Suivante");
+        this.setState({page})
+        this.submit()
+      }
+
     }
 
     render() {
@@ -504,7 +530,7 @@ class HomeScreen extends React.Component<Props, State> {
                 {this.modal()}
                 {this.state.isSearchReady && this.nbrObjFound()}
                 {this.state.isSearchReady && this.ListObjFound()}
-                {this.state.isSearchReady && this.nextPage()}
+                 <Toast ref="toast" position='center' opacity={0.7}/>
             </View>
         );
     }
