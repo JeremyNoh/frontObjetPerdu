@@ -32,6 +32,7 @@ type Props = {
 type State = {
     modalVisible: boolean,
     isAffine: boolean,
+    isStation : boolean,
     isCardInfo: boolean,
     page: number,
     station: array,
@@ -53,6 +54,7 @@ class HomeScreen extends React.Component<Props, State> {
         this.state = {
             modalVisible: false,
             isAffine: false,
+            isStation : false,
             isCardInfo: true,
             page: 1,
             station: [],
@@ -173,7 +175,7 @@ class HomeScreen extends React.Component<Props, State> {
 
     // maj du state sur la nature d'objet séléctionnée
     onNatureChange = (natureChoice: number) => {
-        this.setState({natureChoice});
+        this.setState({natureChoice,isStation : true});
     };
 
     // sid ( station id), tid, ( typeid), nid (nature id), did ( date id )
@@ -274,8 +276,9 @@ class HomeScreen extends React.Component<Props, State> {
                     this.setState({objeFound, isSearchReady: true, PageMax, nbrObj});
                 } else {
                     // erreur connection ou autres
+                    console.log("il n'y a pas de resultats");
                     var objeFound: array = [];
-                    this.setState({objeFound, isSearchReady: true, PageMax: undefined, nbrObj: undefined});
+                    this.setState({objeFound, isSearchReady: true, PageMax: 0, nbrObj: 0});
                     console.log(responseJson.Error);
                 }
             })
@@ -370,7 +373,7 @@ class HomeScreen extends React.Component<Props, State> {
                         marginBottom: 0
 
                     }}
-                    title="J'ai compris !" /* */
+                    title="J'ai compris !"
                     onPress={() => {
                         this.setState({isCardInfo: false});
                     }}
@@ -419,7 +422,7 @@ class HomeScreen extends React.Component<Props, State> {
                                 </Card>
 
                                 {this.state.isAffine && this.affineView()}
-                                {this.villeView()}
+                                {this.state.isStation && this.villeView()}
                             </ScrollView>
                             <Button
                                 title="Rechercher"
