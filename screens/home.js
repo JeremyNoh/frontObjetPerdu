@@ -25,6 +25,7 @@ import {
 
 import MultiSelect from "react-native-sectioned-multi-select";
 import Toast, {DURATION} from 'react-native-easy-toast'
+import PopupDialog, { DialogTitle } from "react-native-popup-dialog";
 
 
 type Props = {
@@ -449,6 +450,46 @@ class HomeScreen extends React.Component<Props, State> {
                               }}
                             />
                         </View>
+
+                        <PopupDialog
+                          dialogTitle={<DialogTitle title="Veuillez rentrer votre Email" />}
+                          ref={popupDialog => {
+                            this.popupDialog = popupDialog;
+                          }}
+                        >
+                          <View style={styles.container}>
+                            <Button
+                              title="Facebook "
+                              buttonStyle={{ marginTop: 20, backgroundColor :'#4267b2' }}
+                              containerStyle={{ marginTop: 20 }}
+                              onPress={() => this.connectFacebook()}
+                            />
+                            <Button
+                              title="Google "
+                              buttonStyle={{ marginTop: 20, backgroundColor :'#d14836' }}
+                              containerStyle={{ marginTop: 20 }}
+                              onPress={() => this.connectGoogle()}
+                            />
+                            <Button
+                              title="Manuellement "
+                              buttonStyle={{ marginTop: 20 }}
+                              containerStyle={{ marginTop: 20 }}
+                              onPress={() => this.connectMannuellement()}
+                            />
+                          </View>
+                        </PopupDialog>
+
+
+                        <Button
+                            title="Créer une alerte"
+                            titleStyle={{fontWeight: "700"}}
+                            buttonStyle= {{backgroundColor: "#D41A42"}}
+                            containerStyle={{marginTop: 20}}
+                            onPress={() => {
+                                this.popupDialog.show();
+                                // this.setModalVisible(false);
+                            }}
+                        />
                     </View>
                 </Modal>
 
@@ -465,6 +506,16 @@ class HomeScreen extends React.Component<Props, State> {
                 />
             </View>
         );
+    }
+
+    connectFacebook():any {
+      alert("Pas encore dispo reviens plus tard :D")
+    }
+    connectGoogle():any {
+      alert("Pas encore dispo reviens plus tard :D")
+    }
+    connectMannuellement():any {
+      alert("Pas encore dispo reviens plus tard :D")
     }
 
 
