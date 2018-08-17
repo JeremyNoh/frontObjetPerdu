@@ -1,6 +1,7 @@
 // @flow
 import React from "react";
 import {
+  AppRegistry,
     Alert,
     Platform,
     StyleSheet,
@@ -48,7 +49,8 @@ type State = {
     isSearchReady: boolean,
     objeFound: array,
     PageMax: number,
-    nbrObj: number
+    nbrObj: number,
+    email: string
 };
 
 class HomeScreen extends React.Component<Props, State> {
@@ -71,6 +73,7 @@ class HomeScreen extends React.Component<Props, State> {
             objeFound: [],
             PageMax: undefined,
             nbrObj: undefined,
+            email: undefined,
         };
     }
 
@@ -462,7 +465,7 @@ class HomeScreen extends React.Component<Props, State> {
                               title="Facebook "
                               buttonStyle={{ marginTop: 20, backgroundColor :'#4267b2' }}
                               containerStyle={{ marginTop: 20 }}
-                              onPress={() => this.connectFacebook()}
+                              onPress={() => this.login()}
                             />
                             <Button
                               title="Google "
@@ -511,6 +514,38 @@ class HomeScreen extends React.Component<Props, State> {
     connectFacebook():any {
       alert("Pas encore dispo reviens plus tard :D")
     }
+
+    // login = async () => {
+    //    const { type, token } = await Expo.Facebook.logInWithReadPermissionsAsync('a9ca8321e4766ca3dc0201e3bacf0846', {
+    //      permissions: ['public_profile'],
+    //    });
+    //    if (type === 'success') {
+    //      const response = await fetch(
+    //       `https://graph.facebook.com/me?access_token=${token}`);
+    //      Alert.alert(
+    //       'Logged in!',
+    //       `Hi ${(await response.json()).name}!`,
+    //      );
+    //    }
+    //   }
+
+      async  login() {
+        const { type, token } = await Expo.Facebook.logInWithReadPermissionsAsync('267723867174602', {
+            permissions: ['public_profile'],
+          });
+        if (type === 'success') {
+          const response = await fetch(
+            `https://graph.facebook.com/me?access_token=${token}&fields=email,name`);
+              const userInfo = await response.json()
+            this.setState({email : userInfo.email})
+          Alert.alert(
+            'Logged in!',
+            `Hi ${userInfo.name}!`,
+          );
+        }
+      }
+
+
     connectGoogle():any {
       alert("Pas encore dispo reviens plus tard :D")
     }
