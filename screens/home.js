@@ -26,8 +26,9 @@ import {
 
 import MultiSelect from "react-native-sectioned-multi-select";
 import Toast, {DURATION} from 'react-native-easy-toast'
-import PopupDialog, { DialogTitle } from "react-native-popup-dialog";
-
+import PopupDialog, { DialogTitle ,DialogButton } from "react-native-popup-dialog";
+import Expo from 'expo';
+import Prompt from 'react-native-prompt-crossplatform';
 
 type Props = {
     /* ... */
@@ -50,7 +51,8 @@ type State = {
     objeFound: array,
     PageMax: number,
     nbrObj: number,
-    email: string
+    userEmail: string,
+    writeEmail :boolean,
 };
 
 class HomeScreen extends React.Component<Props, State> {
@@ -73,7 +75,8 @@ class HomeScreen extends React.Component<Props, State> {
             objeFound: [],
             PageMax: undefined,
             nbrObj: undefined,
-            email: undefined,
+            userEmail: undefined,
+            writeEmail: false,
         };
     }
 
@@ -414,7 +417,7 @@ class HomeScreen extends React.Component<Props, State> {
                     visible={this.state.modalVisible}
                 >
                     <View style={styles.modal}>
-                        <View>
+
                             <ScrollView>
                                 <Card key={1} title=" Type d'objet : ">
                                     <MultiSelect
@@ -441,7 +444,7 @@ class HomeScreen extends React.Component<Props, State> {
 
                                 {this.state.isAffine && this.affineView()}
                                 {this.state.isStation && this.villeView()}
-                            </ScrollView>
+
                             <Button
                                 title="Rechercher"
                                 titleStyle={{fontWeight: "700"}}
@@ -452,36 +455,6 @@ class HomeScreen extends React.Component<Props, State> {
                                   this.submit();
                               }}
                             />
-                        </View>
-
-                        <PopupDialog
-                          dialogTitle={<DialogTitle title="Veuillez rentrer votre Email" />}
-                          ref={popupDialog => {
-                            this.popupDialog = popupDialog;
-                          }}
-                        >
-                          <View style={styles.container}>
-                            <Button
-                              title="Facebook "
-                              buttonStyle={{ marginTop: 20, backgroundColor :'#4267b2' }}
-                              containerStyle={{ marginTop: 20 }}
-                              onPress={() => this.login()}
-                            />
-                            <Button
-                              title="Google "
-                              buttonStyle={{ marginTop: 20, backgroundColor :'#d14836' }}
-                              containerStyle={{ marginTop: 20 }}
-                              onPress={() => this.connectGoogle()}
-                            />
-                            <Button
-                              title="Manuellement "
-                              buttonStyle={{ marginTop: 20 }}
-                              containerStyle={{ marginTop: 20 }}
-                              onPress={() => this.connectMannuellement()}
-                            />
-                          </View>
-                        </PopupDialog>
-
 
                         <Button
                             title="Créer une alerte"
@@ -493,6 +466,8 @@ class HomeScreen extends React.Component<Props, State> {
                                 // this.setModalVisible(false);
                             }}
                         />
+                        </ScrollView>
+                        {this.createAlert()}
                     </View>
                 </Modal>
 
@@ -511,25 +486,71 @@ class HomeScreen extends React.Component<Props, State> {
         );
     }
 
-    connectFacebook():any {
-      alert("Pas encore dispo reviens plus tard :D")
-    }
 
-    // login = async () => {
-    //    const { type, token } = await Expo.Facebook.logInWithReadPermissionsAsync('a9ca8321e4766ca3dc0201e3bacf0846', {
-    //      permissions: ['public_profile'],
-    //    });
-    //    if (type === 'success') {
-    //      const response = await fetch(
-    //       `https://graph.facebook.com/me?access_token=${token}`);
-    //      Alert.alert(
-    //       'Logged in!',
-    //       `Hi ${(await response.json()).name}!`,
-    //      );
-    //    }
-    //   }
+      createAlert(){
+        return(
+          <PopupDialog
+            dialogTitle={<DialogTitle title="Veuillez rentrer votre Email" />}
+            ref={popupDialog => {
+              this.popupDialog = popupDialog;
+            }}
+          >
+              <Button
+                title="Facebook "
+                buttonStyle={{ marginTop: 20, backgroundColor :'#4267b2' }}
+                containerStyle={{ marginTop: 20 }}
+                onPress={() => this.signInWithFacebookAsync()}
+              />
+              <Button
+                title="Google "
+                buttonStyle={{ marginTop: 20, backgroundColor :'#d14836' }}
+                containerStyle={{ marginTop: 20 }}
+                onPress={() => this.signInWithGoogleAsync()}
+              />
+              <Button
+                title="Manuellement "
+                buttonStyle={{ marginTop: 20 }}
+                containerStyle={{ marginTop: 20 }}
+                onPress={() => this.connectMannuellement()}
+              />
+              <Prompt
+                 title="Renseigne ton email"
+                 inputPlaceholder="Enter a Adress email "
+                 placeholder="Enter a Adress email "
+                 isVisible={this.state.writeEmail}
+                 onChangeText={(text) => {
+                   this.setState({ userEmail: text });
+                 }}
+                 onCancel={() => {
+                   this.setState({
+                     userEmail: undefined,
+                     writeEmail: false,
+                   });
+                 }}
+                 onSubmit={() => {
+                   this.setState({
+                     writeEmail: false,
+                   });
+                 }}
+              />
+              <DialogButton
+              text= {"Creer mon alerte"}
+              disabled = {this.state.userEmail  == undefined ? true  : false  }
+              onPress={() => this.submitYourEmail()}
+              />
+          </PopupDialog>
+        )
+      }
 
-      async  login() {
+      submitYourEmail(){
+        this.popupDialog.dismiss(() => {
+          alert("L'alerte est bien Programmer")
+        });
+
+
+      }
+
+      async  signInWithFacebookAsync() {
         const { type, token } = await Expo.Facebook.logInWithReadPermissionsAsync('267723867174602', {
             permissions: ['public_profile'],
           });
@@ -537,7 +558,7 @@ class HomeScreen extends React.Component<Props, State> {
           const response = await fetch(
             `https://graph.facebook.com/me?access_token=${token}&fields=email,name`);
               const userInfo = await response.json()
-            this.setState({email : userInfo.email})
+            this.setState({userEmail : userInfo.email})
           Alert.alert(
             'Logged in!',
             `Hi ${userInfo.name}!`,
@@ -546,11 +567,14 @@ class HomeScreen extends React.Component<Props, State> {
       }
 
 
-    connectGoogle():any {
-      alert("Pas encore dispo reviens plus tard :D")
-    }
+     signInWithGoogleAsync() {
+        alert("Pas encore dispo reviens plus tard :D")
+
+      }
+
     connectMannuellement():any {
-      alert("Pas encore dispo reviens plus tard :D")
+      this.setState({writeEmail : true})
+      // alert("Pas encore dispo reviens plus tard :D")
     }
 
 

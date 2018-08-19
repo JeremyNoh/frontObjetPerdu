@@ -31,6 +31,7 @@
     "react-native-easy-toast": "^1.1.0",
     "react-native-elements": "^0.19.1",
     "react-native-popup-dialog": "^0.15.0",
+    "react-native-prompt-crossplatform": "^1.6.1",
     "react-native-sectioned-multi-select": "^0.5.2",
     "react-navigation": "^2.6.1"
   }
