@@ -486,11 +486,11 @@ class HomeScreen extends React.Component<Props, State> {
         );
     }
 
-
       createAlert(){
         return(
           <PopupDialog
-            dialogTitle={<DialogTitle title="Veuillez rentrer votre Email" />}
+            // dialogTitle={<DialogTitle title="Veuillez rentrer votre Email" />}
+            dialogTitle={<DialogTitle title={this.state.userEmail  == '' ? 'Veuillez rentrer votre Email'  : `Envoyé à : ${this.state.userEmail}`  } />}
             ref={popupDialog => {
               this.popupDialog = popupDialog;
             }}
@@ -571,6 +571,11 @@ class HomeScreen extends React.Component<Props, State> {
 
      async  signInWithGoogleAsync() {
        try {
+         // test
+         this.popupDialog.dismiss(() => {
+           this.setModalVisible(false);
+         });
+         // finTest
          const result = await Expo.Google.logInAsync({
            androidClientId: "438182509769-i7hv6ahrqce4kqi1tt05se0bm81si8l5.apps.googleusercontent.com" 	,
            iosClientId: "438182509769-tdq4o1dh626vnf7a593unil97la8nhu2.apps.googleusercontent.com",
@@ -578,19 +583,23 @@ class HomeScreen extends React.Component<Props, State> {
          });
 
          if (result.type === 'success') {
+
            this.setState({userEmail : result.user.email})
-           Alert.alert(
-             'Logged in!',
-             `Hi ${result.user.name}!`,
-           );
+           // Alert.alert(
+           //   'Logged in!',
+           //   `Hi ${result.user.name}!`,
+           // );
          } else {
            console.log("cancelled");
          }
        } catch(e) {
          console.log('error',e);
        }
+       // test
+       this.setModalVisible(true);
+       this.popupDialog.show();
+       // finTest
      }
-
 
     connectMannuellement():any {
       this.setState({writeEmail : true})
