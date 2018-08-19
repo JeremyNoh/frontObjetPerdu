@@ -81,7 +81,6 @@ class HomeScreen extends React.Component<Props, State> {
     }
 
     // fetch pour récupérer les 3 infos de recherche
-
     componentWillMount(): any {
         fetch("https://objetperduv2.herokuapp.com/api/lost_object/stations")
             .then(response => response.json())
@@ -187,7 +186,7 @@ class HomeScreen extends React.Component<Props, State> {
         this.setState({natureChoice,isStation : true});
     };
 
-    // sid ( station id), tid, ( typeid), nid (nature id), did ( date id )
+    // prepare la query pour fetch
     submit() {
         var query: string = `https://objetperduv2.herokuapp.com/api/lost_object/page=${
             this.state.page+1
@@ -486,6 +485,7 @@ class HomeScreen extends React.Component<Props, State> {
         );
     }
 
+      //  Code UI permettant la creation d'alerte
       createAlert(){
         return(
           <PopupDialog
@@ -511,7 +511,7 @@ class HomeScreen extends React.Component<Props, State> {
                 title="Manuellement "
                 buttonStyle={{ marginTop: 20 }}
                 containerStyle={{ marginTop: 20 }}
-                onPress={() => this.connectMannuellement()}
+                onPress={() => this.signInWithYourEmail()}
               />
               <Prompt
                  title="Renseigne ton email"
@@ -530,9 +530,16 @@ class HomeScreen extends React.Component<Props, State> {
                    });
                  }}
                  onSubmit={() => {
-                   this.setState({
-                     writeEmail: false,
-                   });
+                   if (this.emailVerif()) {
+                     this.setState({writeEmail: false});
+                   }
+                   else {
+                     Alert.alert(
+                       `Email Invalid`,
+                       `Entre une vrai adresse email !`,
+                     )
+
+                   }
                  }}
               />
               <DialogButton
@@ -544,14 +551,29 @@ class HomeScreen extends React.Component<Props, State> {
         )
       }
 
-      submitYourEmail(){
-        this.popupDialog.dismiss(() => {
-          alert("L'alerte est bien Programmer")
-        });
 
-
+      // Verifie si c'est une vrai adresse Mail
+      emailVerif(){
+           const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+           if (reg.test(this.state.userEmail) === true){
+               return true
+           }
+           else{
+                return false
+           }
       }
 
+      // Post dans la BDD une alert
+      submitYourEmail(){
+        this.popupDialog.dismiss(() => {
+          Alert.alert(
+            `Alerte Programmée`,
+            `On t'enverra un mail quand un objet correspondra à ta recherche`,
+          );
+        });
+      }
+
+      // function pour se connecter via Facebook
       async  signInWithFacebookAsync() {
         const { type, token } = await Expo.Facebook.logInWithReadPermissionsAsync('267723867174602', {
             permissions: ['public_profile'],
@@ -569,6 +591,7 @@ class HomeScreen extends React.Component<Props, State> {
       }
 
 
+      // function pour se connecter via Google
      async  signInWithGoogleAsync() {
        try {
          // test
@@ -601,11 +624,12 @@ class HomeScreen extends React.Component<Props, State> {
        // finTest
      }
 
-    connectMannuellement():any {
+     // function pour rentrer son email
+    signInWithYourEmail():any {
       this.setState({writeEmail : true})
     }
 
-
+    //  Permet l'affichage des cards + detection de la fin de la ScrollView
     ListObjFound(): any {
         if (this.state.isSearchReady) {
             return (
@@ -645,6 +669,7 @@ class HomeScreen extends React.Component<Props, State> {
         )
     }
 
+    // function pour Page suivante ou affichage du toast
     nextPage() {
       var page : number = this.state.page
       page += 1
