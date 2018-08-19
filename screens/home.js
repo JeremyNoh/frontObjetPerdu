@@ -13,7 +13,7 @@ import {
     TouchableHighlight,
     TouchableOpacity,
     ScrollView,
-    TextInput
+    TextInput,
 } from "react-native";
 
 import {Text, Button, Card, Badge} from "react-native-elements";
@@ -81,8 +81,8 @@ class HomeScreen extends React.Component<Props, State> {
     }
 
     // fetch pour récupérer les 3 infos de recherche
+
     componentWillMount(): any {
-        console.log("start");
         fetch("https://objetperduv2.herokuapp.com/api/lost_object/stations")
             .then(response => response.json())
             .then(responseJson => {
@@ -569,14 +569,31 @@ class HomeScreen extends React.Component<Props, State> {
       }
 
 
-     signInWithGoogleAsync() {
-        alert("Pas encore dispo reviens plus tard :D")
+     async  signInWithGoogleAsync() {
+       try {
+         const result = await Expo.Google.logInAsync({
+           androidClientId: "438182509769-i7hv6ahrqce4kqi1tt05se0bm81si8l5.apps.googleusercontent.com" 	,
+           iosClientId: "438182509769-tdq4o1dh626vnf7a593unil97la8nhu2.apps.googleusercontent.com",
+           scopes: ['profile', 'email'],
+         });
 
-      }
+         if (result.type === 'success') {
+           this.setState({userEmail : result.user.email})
+           Alert.alert(
+             'Logged in!',
+             `Hi ${result.user.name}!`,
+           );
+         } else {
+           console.log("cancelled");
+         }
+       } catch(e) {
+         console.log('error',e);
+       }
+     }
+
 
     connectMannuellement():any {
       this.setState({writeEmail : true})
-      // alert("Pas encore dispo reviens plus tard :D")
     }
 
 
@@ -597,6 +614,7 @@ class HomeScreen extends React.Component<Props, State> {
                         <Card key={index}>
                             <CardTitle subtitle={item.natureObject}/>
                             <CardContent text={item.typeObject}/>
+                            <CardContent text={item.station}/>
                             <CardAction separator={true} inColumn={false}>
                                 <CardButton
                                     onPress={() => {
