@@ -73,9 +73,9 @@ class HomeScreen extends React.Component<Props, State> {
             newNatureObject: [],
             isSearchReady: false,
             objeFound: [],
-            PageMax: undefined,
-            nbrObj: undefined,
-            userEmail: undefined,
+            PageMax: 0,
+            nbrObj: 0,
+            userEmail: '',
             writeEmail: false,
         };
     }
@@ -403,7 +403,7 @@ class HomeScreen extends React.Component<Props, State> {
         );
     };
 
-    setModalVisible(visible) {
+    setModalVisible(visible : boolean ) {
         this.setState({modalVisible: visible});
     }
 
@@ -515,6 +515,8 @@ class HomeScreen extends React.Component<Props, State> {
               />
               <Prompt
                  title="Renseigne ton email"
+                 submitButtonText="Enregistrer"
+                 cancelButtonText="Retour"
                  inputPlaceholder="Enter a Adress email "
                  placeholder="Enter a Adress email "
                  isVisible={this.state.writeEmail}
@@ -523,7 +525,7 @@ class HomeScreen extends React.Component<Props, State> {
                  }}
                  onCancel={() => {
                    this.setState({
-                     userEmail: undefined,
+                     userEmail: '',
                      writeEmail: false,
                    });
                  }}
@@ -535,7 +537,7 @@ class HomeScreen extends React.Component<Props, State> {
               />
               <DialogButton
               text= {"Creer mon alerte"}
-              disabled = {this.state.userEmail  == undefined ? true  : false  }
+              disabled = {this.state.userEmail  == '' ? true  : false  }
               onPress={() => this.submitYourEmail()}
               />
           </PopupDialog>
