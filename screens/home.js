@@ -52,6 +52,7 @@ type State = {
     PageMax: number,
     nbrObj: number,
     userEmail: string,
+    userName:string,
     writeEmail :boolean,
 };
 
@@ -76,6 +77,7 @@ class HomeScreen extends React.Component<Props, State> {
             PageMax: 0,
             nbrObj: 0,
             userEmail: '',
+            userName:'',
             writeEmail: false,
         };
     }
@@ -565,12 +567,45 @@ class HomeScreen extends React.Component<Props, State> {
 
       // Post dans la BDD une alert
       submitYourEmail(){
-        this.popupDialog.dismiss(() => {
-          Alert.alert(
-            `Alerte Programmée`,
-            `On t'enverra un mail quand un objet correspondra à ta recherche`,
-          );
-        });
+
+        // Creation de l'objet pour le Post
+        var obj = {}
+        obj.mail = this.state.userEmail
+        if (!(this.state.userName == '')) {
+          obj.username = this.state.userName
+        }
+        if (!(this.state.stationChoice == undefined)) {
+          obj.station = this.state.stationChoice[0]
+        }
+        if (!(this.state.natureChoice == undefined)) {
+          obj.natureObject = this.state.natureChoice[0]
+        }
+        if (!(this.state.typeChoice == undefined)) {
+          obj.typeObject = this.state.typeChoice[0]
+        }
+
+        // POST
+        fetch("https://objetperduv2.herokuapp.com/api/lost_object/", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({obj})
+        })
+          .catch(error => {
+            console.error("c'est une erreur !!!", error);
+            Alert.alert("Error un problème est survenu")
+          })
+          .then(res =>
+            this.popupDialog.dismiss(() => {
+              Alert.alert(
+                `Alerte Programmée`,
+                `On t'enverra un mail quand un objet correspondra à ta recherche`,
+              )
+            })
+           );
+
       }
 
       // function pour se connecter via Facebook
@@ -582,7 +617,7 @@ class HomeScreen extends React.Component<Props, State> {
           const response = await fetch(
             `https://graph.facebook.com/me?access_token=${token}&fields=email,name`);
               const userInfo = await response.json()
-            this.setState({userEmail : userInfo.email})
+            this.setState({userEmail : userInfo.email , userName : userInfo.name})
           Alert.alert(
             'Logged in!',
             `Hi ${userInfo.name}!`,
@@ -607,11 +642,7 @@ class HomeScreen extends React.Component<Props, State> {
 
          if (result.type === 'success') {
 
-           this.setState({userEmail : result.user.email})
-           // Alert.alert(
-           //   'Logged in!',
-           //   `Hi ${result.user.name}!`,
-           // );
+           this.setState({userEmail : result.user.email , userName : result.user.name })
          } else {
            console.log("cancelled");
          }
