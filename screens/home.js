@@ -1,7 +1,7 @@
 // @flow
 import React from "react";
 import {
-  AppRegistry,
+    AppRegistry,
     Alert,
     Platform,
     StyleSheet,
@@ -26,7 +26,7 @@ import {
 
 import MultiSelect from "react-native-sectioned-multi-select";
 import Toast, {DURATION} from 'react-native-easy-toast'
-import PopupDialog, { DialogTitle ,DialogButton } from "react-native-popup-dialog";
+import PopupDialog, {DialogTitle, DialogButton} from "react-native-popup-dialog";
 import Expo from 'expo';
 import Prompt from 'react-native-prompt-crossplatform';
 
@@ -37,7 +37,7 @@ type Props = {
 type State = {
     modalVisible: boolean,
     isAffine: boolean,
-    isStation : boolean,
+    isStation: boolean,
     isCardInfo: boolean,
     page: number,
     station: array,
@@ -52,8 +52,8 @@ type State = {
     PageMax: number,
     nbrObj: number,
     userEmail: string,
-    userName:string,
-    writeEmail :boolean,
+    userName: string,
+    writeEmail: boolean,
 };
 
 class HomeScreen extends React.Component<Props, State> {
@@ -62,7 +62,7 @@ class HomeScreen extends React.Component<Props, State> {
         this.state = {
             modalVisible: false,
             isAffine: false,
-            isStation : false,
+            isStation: false,
             isCardInfo: true,
             page: 0,
             station: [],
@@ -77,7 +77,7 @@ class HomeScreen extends React.Component<Props, State> {
             PageMax: 0,
             nbrObj: 0,
             userEmail: '',
-            userName:'',
+            userName: '',
             writeEmail: false,
         };
     }
@@ -185,16 +185,16 @@ class HomeScreen extends React.Component<Props, State> {
 
     // maj du state sur la nature d'objet séléctionnée
     onNatureChange = (natureChoice: number) => {
-        this.setState({natureChoice,isStation : true});
+        this.setState({natureChoice, isStation: true});
     };
 
     // prepare la query pour fetch
     submit() {
         var query: string = `https://objetperduv2.herokuapp.com/api/lost_object/page=${
-            this.state.page+1
+        this.state.page + 1
             }/`;
         var data = {};
-        var page : number = this.state.page+1
+        var page: number = this.state.page + 1
         this.setState({page})
 
         if (!(this.state.typeChoice == undefined)) {
@@ -254,10 +254,10 @@ class HomeScreen extends React.Component<Props, State> {
 
                 // gestion d'erreur si pas d'objet
                 if (responseJson.information) {
-                  var PageMax: number = 0
-                  var nbrObj: number = 0
-                  PageMax = responseJson.information.pages;
-                  nbrObj = responseJson.information.objects;
+                    var PageMax: number = 0
+                    var nbrObj: number = 0
+                    PageMax = responseJson.information.pages;
+                    nbrObj = responseJson.information.objects;
                     let objeFound: array = this.state.objeFound;
                     for (var objectOne of responseJson.found_object) {
                         var objectFoundOne = {};
@@ -285,7 +285,7 @@ class HomeScreen extends React.Component<Props, State> {
                         });
                         objeFound.push(objectFoundOne);
                     }
-                    console.log("nombre de resultat : ",nbrObj);
+                    console.log("nombre de resultat : ", nbrObj);
                     console.log("Page total : ", PageMax);
                     this.setState({objeFound, isSearchReady: true, PageMax, nbrObj});
 
@@ -294,8 +294,8 @@ class HomeScreen extends React.Component<Props, State> {
                     // erreur connection ou autres
 
                     this.refs.toast.show("il n'y a pas de resultats", 1500, () => {
-                       // something you want to do at close
-                   });
+                        // something you want to do at close
+                    });
 
                     var objeFound: array = [];
                     this.setState({objeFound, isSearchReady: true, PageMax: 0, nbrObj: 0});
@@ -305,39 +305,9 @@ class HomeScreen extends React.Component<Props, State> {
             .catch(error => {
                 console.error(error);
             });
-            // ferme le spinner
-             // loading.close();
+        // ferme le spinner
+        // loading.close();
     }
-
-    // Card sur la Gare
-    villeView = () => {
-        return (
-            <View>
-                <Card key={3} title="Gare SNCF :">
-                    <MultiSelect
-                        hideTags
-                        items={this.state.station}
-                        uniqueKey="id"
-                        ref={component => {
-                            this.multiSelect = component;
-                        }}
-                        onSelectedItemsChange={this.onVilleChange}
-                        selectedItems={this.state.stationChoice}
-                        selectText="Recherche la gare SNCF"
-                        searchInputPlaceholderText="Recherche le nom de ta gare"
-                        onChangeInput={text => console.log(text)}
-                        showCancelButton={true}
-                        tagBorderColor="#CCC"
-                        tagTextColor="#CCC"
-                        selectedItemTextColor="#CCC"
-                        itemTextColor="#000"
-                        single={true}
-                        searchInputStyle={{color: "#CCC"}}
-                    />
-                </Card>
-            </View>
-        );
-    };
 
     // Card sur la nature de l'objet
     affineView = () => {
@@ -357,6 +327,40 @@ class HomeScreen extends React.Component<Props, State> {
                         searchInputPlaceholderText="Recherche le nom de ta gare"
                         onChangeInput={text => console.log(text)}
                         showCancelButton={true}
+                        confirmText="je confirme"
+                        searchPlaceholderText="recherche la nature de ton objet"
+                        tagBorderColor="#CCC"
+                        tagTextColor="#CCC"
+                        selectedItemTextColor="#CCC"
+                        itemTextColor="#000"
+                        single={true}
+                        searchInputStyle={{color: "#CCC"}}
+                    />
+                </Card>
+            </View>
+        );
+    };
+
+    // Card sur la Gare
+    villeView = () => {
+        return (
+            <View>
+                <Card key={3} title="Gare SNCF :">
+                    <MultiSelect
+                        hideTags
+                        items={this.state.station}
+                        uniqueKey="id"
+                        ref={component => {
+                            this.multiSelect = component;
+                        }}
+                        onSelectedItemsChange={this.onVilleChange}
+                        selectedItems={this.state.stationChoice}
+                        selectText="Recherche la gare SNCF"
+                        searchInputPlaceholderText="Recherche le nom de ta gare"
+                        onChangeInput={text => console.log(text)}
+                        showCancelButton={true}
+                        confirmText="je confirme"
+                        searchPlaceholderText="Rechercher une gare"
                         tagBorderColor="#CCC"
                         tagTextColor="#CCC"
                         selectedItemTextColor="#CCC"
@@ -381,8 +385,8 @@ class HomeScreen extends React.Component<Props, State> {
                 <Text style={{marginBottom: 5}}>
                     Vous avez oublié un objet dans une gare SNCF et vous vous demandez comment le récupérer
                     ?
-                  </Text>
-                  <Text style={{marginBottom: 10}}>
+                </Text>
+                <Text style={{marginBottom: 10}}>
                     Plus besoin de vous déplacer ou de passer votre temps au téléphone, il vous suffit simplement de
                     faire votre recherche grâce à cette application.
                 </Text>
@@ -404,7 +408,7 @@ class HomeScreen extends React.Component<Props, State> {
         );
     };
 
-    setModalVisible(visible : boolean ) {
+    setModalVisible(visible: boolean) {
         this.setState({modalVisible: visible});
     }
 
@@ -419,32 +423,34 @@ class HomeScreen extends React.Component<Props, State> {
                 >
                     <View style={styles.modal}>
 
-                            <ScrollView>
-                                <Card key={1} title=" Type d'objet : ">
-                                    <MultiSelect
-                                        hideTags
-                                        items={this.state.typeObject}
-                                        uniqueKey="id"
-                                        ref={component => {
-                                            this.multiSelect = component;
-                                        }}
-                                        onSelectedItemsChange={this.onTypeChange}
-                                        selectedItems={this.state.typeChoice}
-                                        selectText="Choisi ton type d'objet"
-                                        searchInputPlaceholderText="Search Items..."
-                                        onChangeInput={text => console.log(text)}
-                                        tagBorderColor="#CCC"
-                                        showCancelButton={true}
-                                        tagTextColor="#CCC"
-                                        selectedItemTextColor="#CCC"
-                                        itemTextColor="#000"
-                                        single={true}
-                                        searchInputStyle={{color: "#CCC"}}
-                                    />
-                                </Card>
+                        <ScrollView>
+                            <Card key={1} title=" Type d'objet : ">
+                                <MultiSelect
+                                    hideTags
+                                    items={this.state.typeObject}
+                                    uniqueKey="id"
+                                    ref={component => {
+                                        this.multiSelect = component;
+                                    }}
+                                    onSelectedItemsChange={this.onTypeChange}
+                                    selectedItems={this.state.typeChoice}
+                                    selectText="Choisi ton type d'objet"
+                                    searchInputPlaceholderText="Search Items..."
+                                    onChangeInput={text => console.log(text)}
+                                    tagBorderColor="#CCC"
+                                    showCancelButton={true}
+                                    confirmText="je confirme"
+                                    searchPlaceholderText="recherche un type d'objet"
+                                    tagTextColor="#CCC"
+                                    selectedItemTextColor="#CCC"
+                                    itemTextColor="#000"
+                                    single={true}
+                                    searchInputStyle={{color: "#CCC"}}
+                                />
+                            </Card>
 
-                                {this.state.isAffine && this.affineView()}
-                                {this.state.isStation && this.villeView()}
+                            {this.state.isAffine && this.affineView()}
+                            {this.state.isStation && this.villeView()}
 
                             <Button
                                 title="Rechercher"
@@ -452,21 +458,21 @@ class HomeScreen extends React.Component<Props, State> {
                                 buttonStyle={styles.buttonStyle}
                                 containerStyle={{marginTop: 20}}
                                 onPress={() => {
-                                  // loading.show();
-                                  this.submit();
-                              }}
+                                    // loading.show();
+                                    this.submit();
+                                }}
                             />
 
-                        <Button
-                            title="Créer une alerte"
-                            titleStyle={{fontWeight: "700"}}
-                            buttonStyle= {{backgroundColor: "#D41A42"}}
-                            containerStyle={{marginTop: 20}}
-                            onPress={() => {
-                                this.popupDialog.show();
-                                // this.setModalVisible(false);
-                            }}
-                        />
+                            <Button
+                                title="Créer une alerte"
+                                titleStyle={{fontWeight: "700"}}
+                                buttonStyle={{backgroundColor: "#D41A42"}}
+                                containerStyle={{marginTop: 20}}
+                                onPress={() => {
+                                    this.createAlert();
+                                    // this.setModalVisible(false);
+                                }}
+                            />
                         </ScrollView>
                         {this.createAlert()}
                     </View>
@@ -477,9 +483,9 @@ class HomeScreen extends React.Component<Props, State> {
                     titleStyle={{fontWeight: "700"}}
                     containerStyle={{marginTop: 20}}
                     onPress={() => {
-                      var page : number  = 0 ;
-                      var objeFound : array = [];
-                        this.setState({isCardInfo: false ,page,objeFound });
+                        var page: number = 0;
+                        var objeFound: array = [];
+                        this.setState({isCardInfo: false, page, objeFound});
                         this.setModalVisible(true);
                     }}
                 />
@@ -487,177 +493,178 @@ class HomeScreen extends React.Component<Props, State> {
         );
     }
 
-      //  Code UI permettant la creation d'alerte
-      createAlert(){
-        return(
-          <PopupDialog
-            // dialogTitle={<DialogTitle title="Veuillez rentrer votre Email" />}
-            dialogTitle={<DialogTitle title={this.state.userEmail  == '' ? 'Veuillez rentrer votre Email'  : `Envoyé à : ${this.state.userEmail}`  } />}
-            ref={popupDialog => {
-              this.popupDialog = popupDialog;
-            }}
-          >
-              <Button
-                title="Facebook "
-                buttonStyle={{ marginTop: 20, backgroundColor :'#4267b2' }}
-                containerStyle={{ marginTop: 20 }}
-                onPress={() => this.signInWithFacebookAsync()}
-              />
-              <Button
-                title="Google "
-                buttonStyle={{ marginTop: 20, backgroundColor :'#d14836' }}
-                containerStyle={{ marginTop: 20 }}
-                onPress={() => this.signInWithGoogleAsync()}
-              />
-              <Button
-                title="Manuellement "
-                buttonStyle={{ marginTop: 20 }}
-                containerStyle={{ marginTop: 20 }}
-                onPress={() => this.signInWithYourEmail()}
-              />
-              <Prompt
-                 title="Renseigne ton email"
-                 submitButtonText="Enregistrer"
-                 cancelButtonText="Retour"
-                 inputPlaceholder="Enter a Adress email "
-                 placeholder="Enter a Adress email "
-                 isVisible={this.state.writeEmail}
-                 onChangeText={(text) => {
-                   this.setState({ userEmail: text });
-                 }}
-                 onCancel={() => {
-                   this.setState({
-                     userEmail: '',
-                     writeEmail: false,
-                   });
-                 }}
-                 onSubmit={() => {
-                   if (this.emailVerif()) {
-                     this.setState({writeEmail: false});
-                   }
-                   else {
-                     Alert.alert(
-                       `Email Invalid`,
-                       `Entre une vrai adresse email !`,
-                     )
+    //  Code UI permettant la creation d'alerte
+    createAlert() {
+        return (
+            <PopupDialog
+                // dialogTitle={<DialogTitle title="Veuillez rentrer votre Email" />}
+                dialogTitle={<DialogTitle
+                    title={this.state.userEmail == '' ? 'Veuillez rentrer votre Email' : `Envoyé à : ${this.state.userEmail}`}/>}
+                ref={popupDialog => {
+                    this.popupDialog = popupDialog;
+                }}
+            >
+                <Button
+                    title="Facebook "
+                    buttonStyle={{marginTop: 20, backgroundColor: '#4267b2'}}
+                    containerStyle={{marginTop: 20}}
+                    onPress={() => this.signInWithFacebookAsync()}
+                />
+                <Button
+                    title="Google "
+                    buttonStyle={{marginTop: 20, backgroundColor: '#d14836'}}
+                    containerStyle={{marginTop: 20}}
+                    onPress={() => this.signInWithGoogleAsync()}
+                />
+                <Button
+                    title="Manuellement "
+                    buttonStyle={{marginTop: 20}}
+                    containerStyle={{marginTop: 20}}
+                    onPress={() => this.signInWithYourEmail()}
+                />
+                <Prompt
+                    title="Renseigne ton email"
+                    submitButtonText="Enregistrer"
+                    cancelButtonText="Retour"
+                    inputPlaceholder="Enter a Adress email "
+                    placeholder="Enter a Adress email "
+                    isVisible={this.state.writeEmail}
+                    onChangeText={(text) => {
+                        this.setState({userEmail: text});
+                    }}
+                    onCancel={() => {
+                        this.setState({
+                            userEmail: '',
+                            writeEmail: false,
+                        });
+                    }}
+                    onSubmit={() => {
+                        if (this.emailVerif()) {
+                            this.setState({writeEmail: false});
+                        }
+                        else {
+                            Alert.alert(
+                                `Email Invalid`,
+                                `Entre une vrai adresse email !`,
+                            )
 
-                   }
-                 }}
-              />
-              <DialogButton
-              text= {"Creer mon alerte"}
-              disabled = {this.state.userEmail  == '' ? true  : false  }
-              onPress={() => this.submitYourEmail()}
-              />
-          </PopupDialog>
+                        }
+                    }}
+                />
+                <DialogButton
+                    text={"Creer mon alerte"}
+                    disabled={this.state.userEmail == '' ? true : false}
+                    onPress={() => this.submitYourEmail()}
+                />
+            </PopupDialog>
         )
-      }
+    }
 
 
-      // Verifie si c'est une vrai adresse Mail
-      emailVerif(){
-           const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-           if (reg.test(this.state.userEmail) === true){
-               return true
-           }
-           else{
-                return false
-           }
-      }
+    // Verifie si c'est une vrai adresse Mail
+    emailVerif() {
+        const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (reg.test(this.state.userEmail) === true) {
+            return true
+        }
+        else {
+            return false
+        }
+    }
 
-      // Post dans la BDD une alert
-      submitYourEmail(){
+    // Post dans la BDD une alert
+    submitYourEmail() {
 
         // Creation de l'objet pour le Post
         var obj = {}
         obj.mail = this.state.userEmail
         if (!(this.state.userName == '')) {
-          obj.username = this.state.userName
+            obj.username = this.state.userName
         }
         if (!(this.state.stationChoice == undefined)) {
-          obj.station = this.state.stationChoice[0]
+            obj.station = this.state.stationChoice[0]
         }
         if (!(this.state.natureChoice == undefined)) {
-          obj.natureObject = this.state.natureChoice[0]
+            obj.natureObject = this.state.natureChoice[0]
         }
         if (!(this.state.typeChoice == undefined)) {
-          obj.typeObject = this.state.typeChoice[0]
+            obj.typeObject = this.state.typeChoice[0]
         }
 
         // POST
         fetch("https://objetperduv2.herokuapp.com/api/lost_object/", {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({obj})
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({obj})
         })
-          .catch(error => {
-            console.error("c'est une erreur !!!", error);
-            Alert.alert("Error un problème est survenu")
-          })
-          .then(res =>
-            this.popupDialog.dismiss(() => {
-              Alert.alert(
-                `Alerte Programmée`,
-                `On t'enverra un mail quand un objet correspondra à ta recherche`,
-              )
+            .catch(error => {
+                console.error("c'est une erreur !!!", error);
+                Alert.alert("Error un problème est survenu")
             })
-           );
+            .then(res =>
+                this.popupDialog.dismiss(() => {
+                    Alert.alert(
+                        `Alerte Programmée`,
+                        `On t'enverra un mail quand un objet correspondra à ta recherche`,
+                    )
+                })
+            );
 
-      }
+    }
 
-      // function pour se connecter via Facebook
-      async  signInWithFacebookAsync() {
-        const { type, token } = await Expo.Facebook.logInWithReadPermissionsAsync('267723867174602', {
+    // function pour se connecter via Facebook
+    async signInWithFacebookAsync() {
+        const {type, token} = await Expo.Facebook.logInWithReadPermissionsAsync('267723867174602', {
             permissions: ['public_profile'],
-          });
+        });
         if (type === 'success') {
-          const response = await fetch(
-            `https://graph.facebook.com/me?access_token=${token}&fields=email,name`);
-              const userInfo = await response.json()
-            this.setState({userEmail : userInfo.email , userName : userInfo.name})
-          Alert.alert(
-            'Logged in!',
-            `Hi ${userInfo.name}!`,
-          );
+            const response = await fetch(
+                `https://graph.facebook.com/me?access_token=${token}&fields=email,name`);
+            const userInfo = await response.json()
+            this.setState({userEmail: userInfo.email, userName: userInfo.name})
+            Alert.alert(
+                'Logged in!',
+                `Hi ${userInfo.name}!`,
+            );
         }
-      }
+    }
 
 
-      // function pour se connecter via Google
-     async  signInWithGoogleAsync() {
-       try {
-         // test
-         this.popupDialog.dismiss(() => {
-           this.setModalVisible(false);
-         });
-         // finTest
-         const result = await Expo.Google.logInAsync({
-           androidClientId: "438182509769-i7hv6ahrqce4kqi1tt05se0bm81si8l5.apps.googleusercontent.com" 	,
-           iosClientId: "438182509769-tdq4o1dh626vnf7a593unil97la8nhu2.apps.googleusercontent.com",
-           scopes: ['profile', 'email'],
-         });
+    // function pour se connecter via Google
+    async signInWithGoogleAsync() {
+        try {
+            // test
+            this.popupDialog.dismiss(() => {
+                this.setModalVisible(false);
+            });
+            // finTest
+            const result = await Expo.Google.logInAsync({
+                androidClientId: "438182509769-i7hv6ahrqce4kqi1tt05se0bm81si8l5.apps.googleusercontent.com",
+                iosClientId: "438182509769-tdq4o1dh626vnf7a593unil97la8nhu2.apps.googleusercontent.com",
+                scopes: ['profile', 'email'],
+            });
 
-         if (result.type === 'success') {
+            if (result.type === 'success') {
 
-           this.setState({userEmail : result.user.email , userName : result.user.name })
-         } else {
-           console.log("cancelled");
-         }
-       } catch(e) {
-         console.log('error',e);
-       }
-       // test
-       this.setModalVisible(true);
-       this.popupDialog.show();
-       // finTest
-     }
+                this.setState({userEmail: result.user.email, userName: result.user.name})
+            } else {
+                console.log("cancelled");
+            }
+        } catch (e) {
+            console.log('error', e);
+        }
+        // test
+        this.setModalVisible(true);
+        this.popupDialog.show();
+        // finTest
+    }
 
-     // function pour rentrer son email
-    signInWithYourEmail():any {
-      this.setState({writeEmail : true})
+    // function pour rentrer son email
+    signInWithYourEmail(): any {
+        this.setState({writeEmail: true})
     }
 
     //  Permet l'affichage des cards + detection de la fin de la ScrollView
@@ -665,11 +672,11 @@ class HomeScreen extends React.Component<Props, State> {
         if (this.state.isSearchReady) {
             return (
                 <ScrollView
-                    onMomentumScrollEnd={(e)=>{
+                    onMomentumScrollEnd={(e) => {
                         var windowHeight = Dimensions.get('window').height,
                             height = e.nativeEvent.contentSize.height,
                             offset = e.nativeEvent.contentOffset.y;
-                        if( windowHeight + offset >= height ){
+                        if (windowHeight + offset >= height) {
                             this.nextPage()
                         }
                     }}
@@ -682,6 +689,7 @@ class HomeScreen extends React.Component<Props, State> {
                             <CardAction separator={true} inColumn={false}>
                                 <CardButton
                                     onPress={() => {
+                                        this.popupDialog.show();
                                     }}
                                     title="c'est mon Objet"
                                     color="#E41E62"
@@ -702,19 +710,19 @@ class HomeScreen extends React.Component<Props, State> {
 
     // function pour Page suivante ou affichage du toast
     nextPage() {
-      var page : number = this.state.page
-      page += 1
-      if (this.state.PageMax < page) {
-        this.refs.toast.show("il n'y a plus d'autre Objet revenez plus tard", 1500, () => {
-       // something you want to do at close
-   });
-      }
-      else {
-        // loading.show()
-        console.log("page Suivante");
-        this.setState({page})
-        this.submit()
-      }
+        var page: number = this.state.page
+        page += 1
+        if (this.state.PageMax < page) {
+            this.refs.toast.show("il n'y a plus d'autre Objet revenez plus tard", 1500, () => {
+                // something you want to do at close
+            });
+        }
+        else {
+            // loading.show()
+            console.log("page Suivante");
+            this.setState({page})
+            this.submit()
+        }
 
     }
 
@@ -725,7 +733,7 @@ class HomeScreen extends React.Component<Props, State> {
                 {this.modal()}
                 {this.state.isSearchReady && this.nbrObjFound()}
                 {this.state.isSearchReady && this.ListObjFound()}
-                 <Toast ref="toast" position='center' opacity={0.7}/>
+                <Toast ref="toast" position='center' opacity={0.7}/>
             </View>
         );
     }
