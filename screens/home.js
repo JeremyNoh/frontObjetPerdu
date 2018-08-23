@@ -689,7 +689,7 @@ class HomeScreen extends React.Component<Props, State> {
                             <CardAction separator={true} inColumn={false}>
                                 <CardButton
                                     onPress={() => {
-                                        this.popupDialog.show();
+                                        this.createAlert();
                                     }}
                                     title="c'est mon Objet"
                                     color="#E41E62"
