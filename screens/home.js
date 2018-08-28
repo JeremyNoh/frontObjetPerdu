@@ -469,7 +469,7 @@ class HomeScreen extends React.Component<Props, State> {
                                 buttonStyle={{backgroundColor: "#D41A42"}}
                                 containerStyle={{marginTop: 20}}
                                 onPress={() => {
-                                    this.createAlert();
+                                     this.popupDialog.show()
                                     // this.setModalVisible(false);
                                 }}
                             />
