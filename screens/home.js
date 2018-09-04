@@ -472,7 +472,7 @@ class HomeScreen extends React.Component<Props, State> {
                                 buttonStyle={{backgroundColor: "#D41A42"}}
                                 containerStyle={{marginTop: 20}}
                                 onPress={() => {
-                                     this.popupDialog.show()
+                                    this.popupDialog.show()
                                     // this.setModalVisible(false);
                                 }}
                             />
@@ -597,25 +597,25 @@ class HomeScreen extends React.Component<Props, State> {
         console.log(obj);
 
         fetch('https://objetperduv2.herokuapp.com/api/user/alert', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(obj),
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(obj),
         })
-        .catch(error => {
-            console.error("c'est une erreur !!!", error);
-            Alert.alert("Error un problème est survenu")
-        })
-        .then((response) => response.json())
+            .catch(error => {
+                console.error("c'est une erreur !!!", error);
+                Alert.alert("Error un problème est survenu")
+            })
+            .then((response) => response.json())
             .then(responseJson => {
-              this.popupDialog.dismiss(() => {
-                  Alert.alert(
-                      `Alerte Programmée`,
-                      `On t'enverra un mail quand un objet correspondra à ta recherche`,
-                  )
-              })
+                this.popupDialog.dismiss(() => {
+                    Alert.alert(
+                        `Alerte Programmée`,
+                        `On t'enverra un mail quand un objet correspondra à ta recherche`,
+                    )
+                })
             })
 
     }
