@@ -29,8 +29,8 @@ import Toast, {DURATION} from 'react-native-easy-toast'
 import PopupDialog, {DialogTitle, DialogButton} from "react-native-popup-dialog";
 import Expo from 'expo';
 import Prompt from 'react-native-prompt-crossplatform';
-
-import CalendarPicker from 'react-native-calendar-picker';
+import moment from 'moment';
+import 'moment/locale/fr'
 
 
 type Props = {
@@ -415,6 +415,12 @@ class HomeScreen extends React.Component<Props, State> {
         this.setState({modalVisible: visible});
     }
 
+    onDateChange(date) {
+    this.setState({
+      selectedStartDate: date,
+    });
+  }
+
     // modal pour la recherche
     modal() {
         return (
@@ -467,9 +473,11 @@ class HomeScreen extends React.Component<Props, State> {
                             />
 
                             <Button
+
+                            disabled={!this.state.isStation }
                                 title="Créer une alerte"
                                 titleStyle={{fontWeight: "700"}}
-                                buttonStyle={{backgroundColor: "#D41A42"}}
+                                buttonStyle={{backgroundColor: "#428BCA"}}
                                 containerStyle={{marginTop: 20}}
                                 onPress={() => {
                                     this.popupDialog.show()
@@ -483,7 +491,8 @@ class HomeScreen extends React.Component<Props, State> {
 
                 <Button
                     title="Nouvelle recherche"
-                    titleStyle={{fontWeight: "700"}}
+                    buttonStyle ={{ backgroundColor : '#5CB85C'}}
+                    titleStyle={{fontWeight: "700" }}
                     containerStyle={{marginTop: 20}}
                     onPress={() => {
                         var page: number = 0;
@@ -551,12 +560,12 @@ class HomeScreen extends React.Component<Props, State> {
                                 `Email Invalid`,
                                 `Entre une vrai adresse email !`,
                             )
-
                         }
                     }}
                 />
                 <DialogButton
                     text={"Creer mon alerte"}
+                    buttonStyle={{ Color: '#428BCA'}}
                     disabled={this.state.userEmail == '' ? true : false}
                     onPress={() => this.submitYourEmail()}
                 />
@@ -676,6 +685,7 @@ class HomeScreen extends React.Component<Props, State> {
     //  Permet l'affichage des cards + detection de la fin de la ScrollView
     ListObjFound(): any {
         if (this.state.isSearchReady) {
+          moment.locale('fr')
             return (
                 <ScrollView
                     onMomentumScrollEnd={(e) => {
@@ -690,16 +700,13 @@ class HomeScreen extends React.Component<Props, State> {
                     {this.state.objeFound.map((item, index) => (
                         <Card key={index}>
                             <CardTitle subtitle={item.natureObject}/>
-                            <CardContent text={item.typeObject}/>
                             <CardContent text={item.station}/>
                             <CardAction separator={true} inColumn={false}>
-                                <CardButton
-                                    onPress={() => {
-                                        this.createAlert();
-                                    }}
-                                    title="c'est mon Objet"
-                                    color="#E41E62"
-                                />
+                            <Text style={{marginBottom: 5 , color : "#E41E62" , fontWeight: 'bold', marginTop : 5}}>
+                                {  moment(item.date).locale('fr').format("LL")}
+                            </Text>
+
+
                             </CardAction>
                         </Card>
                     ))}
@@ -777,14 +784,15 @@ const styles = StyleSheet.create({
 
     buttonStyle: {
         alignItems: "center",
-        backgroundColor: "#66ff99",
+        backgroundColor: "#5CB85C",
         padding: 10,
         marginBottom: 30,
         marginTop: 50,
         borderRadius: 5
     },
     cardTitle: {
-        backgroundColor: "#A6ACAF",
-        borderRadius: 5
+        backgroundColor: "#fff",
+
+        borderRadius: 5,
     }
 });
