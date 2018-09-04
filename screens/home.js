@@ -8,7 +8,6 @@ import {
     View,
     Dimensions,
     Image,
-    // Text,
     Modal,
     TouchableHighlight,
     TouchableOpacity,
@@ -21,7 +20,6 @@ import {
     CardTitle,
     CardContent,
     CardAction,
-    CardButton
 } from "react-native-cards";
 
 import MultiSelect from "react-native-sectioned-multi-select";
@@ -159,7 +157,6 @@ class HomeScreen extends React.Component<Props, State> {
             }
         };
     };
-    // Fin navigationOptions
 
     // maj du state sur la station séléctionnée
     onVilleChange = (stationChoice: [number]) => {
@@ -229,7 +226,6 @@ class HomeScreen extends React.Component<Props, State> {
                 query += `&nid=${this.state.natureChoice[0]}`;
             }
         }
-        // navigue sur la page des card , avec les params nécéssaires
 
         // ferme le modal
         this.fetchResult(query);
@@ -237,7 +233,7 @@ class HomeScreen extends React.Component<Props, State> {
         this.setModalVisible(false);
     }
 
-// renvois un boolean pour savoir si c'est le first params sur la query
+    // renvoi un boolean pour savoir si c'est le first params sur la query
     firstParams(query: string): boolean {
         query = query.substr(query.length - 1, 1)
         if (query == "/") {
@@ -295,9 +291,7 @@ class HomeScreen extends React.Component<Props, State> {
 
                 } else {
                     // erreur connection ou autres
-
                     this.refs.toast.show("il n'y a pas de resultats", 1500, () => {
-                        // something you want to do at close
                     });
 
                     var objeFound: array = [];
@@ -416,10 +410,10 @@ class HomeScreen extends React.Component<Props, State> {
     }
 
     onDateChange(date) {
-    this.setState({
-      selectedStartDate: date,
-    });
-  }
+        this.setState({
+            selectedStartDate: date,
+        });
+    }
 
     // modal pour la recherche
     modal() {
@@ -444,7 +438,6 @@ class HomeScreen extends React.Component<Props, State> {
                                     onSelectedItemsChange={this.onTypeChange}
                                     selectedItems={this.state.typeChoice}
                                     selectText="Choisi ton type d'objet"
-                                    searchInputPlaceholderText="Search Items..."
                                     onChangeInput={text => console.log(text)}
                                     tagBorderColor="#CCC"
                                     showCancelButton={true}
@@ -474,7 +467,7 @@ class HomeScreen extends React.Component<Props, State> {
 
                             <Button
 
-                            disabled={!this.state.isStation }
+                                disabled={!this.state.isStation}
                                 title="Créer une alerte"
                                 titleStyle={{fontWeight: "700"}}
                                 buttonStyle={{backgroundColor: "#428BCA"}}
@@ -491,8 +484,8 @@ class HomeScreen extends React.Component<Props, State> {
 
                 <Button
                     title="Nouvelle recherche"
-                    buttonStyle ={{ backgroundColor : '#5CB85C'}}
-                    titleStyle={{fontWeight: "700" }}
+                    buttonStyle={{backgroundColor: '#5CB85C'}}
+                    titleStyle={{fontWeight: "700"}}
                     containerStyle={{marginTop: 20}}
                     onPress={() => {
                         var page: number = 0;
@@ -509,7 +502,6 @@ class HomeScreen extends React.Component<Props, State> {
     createAlert() {
         return (
             <PopupDialog
-                // dialogTitle={<DialogTitle title="Veuillez rentrer votre Email" />}
                 dialogTitle={<DialogTitle
                     title={this.state.userEmail == '' ? 'Veuillez rentrer votre Email' : `Envoyé à : ${this.state.userEmail}`}/>}
                 ref={popupDialog => {
@@ -517,30 +509,30 @@ class HomeScreen extends React.Component<Props, State> {
                 }}
             >
                 <Button
-                    title="Facebook "
+                    title="Facebook"
                     buttonStyle={{marginTop: 20, backgroundColor: '#4267b2'}}
                     containerStyle={{marginTop: 20}}
                     onPress={() => this.signInWithFacebookAsync()}
                 />
                 <Button
-                    title="Google "
+                    title="Google"
                     buttonStyle={{marginTop: 20, backgroundColor: '#d14836'}}
                     containerStyle={{marginTop: 20}}
                     onPress={() => this.signInWithGoogleAsync()}
                 />
 
                 <Button
-                    title="Manuellement "
+                    title="E-mail"
                     buttonStyle={{marginTop: 20}}
                     containerStyle={{marginTop: 20}}
                     onPress={() => this.signInWithYourEmail()}
                 />
                 <Prompt
-                    title="Renseigne ton email"
+                    title="Renseignez votre email"
                     submitButtonText="Enregistrer"
                     cancelButtonText="Retour"
-                    inputPlaceholder="Enter a Adress email "
-                    placeholder="Enter a Adress email "
+                    placeholder="Example@domaine.com"
+                    inputPlaceholder="Example@domaine.com"
                     isVisible={this.state.writeEmail}
                     onChangeText={(text) => {
                         this.setState({userEmail: text});
@@ -557,15 +549,14 @@ class HomeScreen extends React.Component<Props, State> {
                         }
                         else {
                             Alert.alert(
-                                `Email Invalid`,
-                                `Entre une vrai adresse email !`,
+                                `Email non valide`,
+                                `Veuillez entrer un email correct`,
                             )
                         }
                     }}
                 />
                 <DialogButton
-                    text={"Creer mon alerte"}
-                    buttonStyle={{ Color: '#428BCA'}}
+                    text={"Créer mon alerte"}
                     disabled={this.state.userEmail == '' ? true : false}
                     onPress={() => this.submitYourEmail()}
                 />
@@ -615,14 +606,14 @@ class HomeScreen extends React.Component<Props, State> {
         })
             .catch(error => {
                 console.error("c'est une erreur !!!", error);
-                Alert.alert("Error un problème est survenu")
+                Alert.alert("Erreur un problème est survenu")
             })
             .then((response) => response.json())
             .then(responseJson => {
                 this.popupDialog.dismiss(() => {
                     Alert.alert(
                         `Alerte Programmée`,
-                        `On t'enverra un mail quand un objet correspondra à ta recherche`,
+                        `Un email vous sera envoyé lorsque votre objet sera trouvé`,
                     )
                 })
             })
@@ -640,12 +631,11 @@ class HomeScreen extends React.Component<Props, State> {
             const userInfo = await response.json()
             this.setState({userEmail: userInfo.email, userName: userInfo.name})
             Alert.alert(
-                'Logged in!',
-                `Hi ${userInfo.name}!`,
+                'Connecté',
+                `Bonjour ${userInfo.name}!`,
             );
         }
     }
-
 
     // function pour se connecter via Google
     async signInWithGoogleAsync() {
@@ -670,10 +660,8 @@ class HomeScreen extends React.Component<Props, State> {
         } catch (e) {
             console.log('error', e);
         }
-        // test
         this.setModalVisible(true);
         this.popupDialog.show();
-        // finTest
     }
 
 
@@ -685,7 +673,7 @@ class HomeScreen extends React.Component<Props, State> {
     //  Permet l'affichage des cards + detection de la fin de la ScrollView
     ListObjFound(): any {
         if (this.state.isSearchReady) {
-          moment.locale('fr')
+            moment.locale('fr')
             return (
                 <ScrollView
                     onMomentumScrollEnd={(e) => {
@@ -702,9 +690,9 @@ class HomeScreen extends React.Component<Props, State> {
                             <CardTitle subtitle={item.natureObject}/>
                             <CardContent text={item.station}/>
                             <CardAction separator={true} inColumn={false}>
-                            <Text style={{marginBottom: 5 , color : "#E41E62" , fontWeight: 'bold', marginTop : 5}}>
-                                {  moment(item.date).locale('fr').format("LL")}
-                            </Text>
+                                <Text style={{marginBottom: 5, color: "#E41E62", fontWeight: 'bold', marginTop: 5}}>
+                                    {moment(item.date).locale('fr').format("LL")}
+                                </Text>
 
 
                             </CardAction>
@@ -726,13 +714,11 @@ class HomeScreen extends React.Component<Props, State> {
         var page: number = this.state.page
         page += 1
         if (this.state.PageMax < page) {
-            this.refs.toast.show("il n'y a plus d'autre Objet revenez plus tard", 1500, () => {
-                // something you want to do at close
+            this.refs.toast.show("Liste d'objet chargée. Veuillez créer une alerte", 1500, () => {
             });
         }
         else {
             // loading.show()
-            console.log("page Suivante");
             this.setState({page})
             this.submit()
         }
@@ -757,13 +743,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff"
-        // alignItems: "center",
-        // justifyContent: 'center',
     },
 
     modal: {
         backgroundColor: "#fff",
-        // alignItems: "center",
         justifyContent: "center",
         marginTop: 40
     },
@@ -777,7 +760,6 @@ const styles = StyleSheet.create({
     titleSearch: {
         textAlign: "center",
         color: "#5C63D8",
-        // textDecorationLine : "underline" ,
         paddingTop: 20,
         paddingBottom: 20
     },
@@ -792,7 +774,6 @@ const styles = StyleSheet.create({
     },
     cardTitle: {
         backgroundColor: "#fff",
-
         borderRadius: 5,
     }
 });
