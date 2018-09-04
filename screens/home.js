@@ -193,7 +193,7 @@ class HomeScreen extends React.Component<Props, State> {
 
     // prepare la query pour fetch
     submit() {
-        var query: string = `https://objetperduv2.herokuapp.com/api/lost_object/page=${
+        var query: string = `https://objetperduv2.herokuapp.com/api/lost_object/page/${
         this.state.page + 1
             }/`;
         var data = {};
@@ -519,6 +519,7 @@ class HomeScreen extends React.Component<Props, State> {
                     containerStyle={{marginTop: 20}}
                     onPress={() => this.signInWithGoogleAsync()}
                 />
+
                 <Button
                     title="Manuellement "
                     buttonStyle={{marginTop: 20}}
@@ -580,7 +581,7 @@ class HomeScreen extends React.Component<Props, State> {
 
         // Creation de l'objet pour le Post
         var obj = {}
-        obj.mail = this.state.userEmail
+        obj.email = this.state.userEmail
         if (!(this.state.userName == '')) {
             obj.username = this.state.userName
         }
@@ -595,27 +596,27 @@ class HomeScreen extends React.Component<Props, State> {
         }
         console.log(obj);
 
-        // POST
-        fetch("https://objetperduv2.herokuapp.com/api/lost_object/", {
-            method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({obj})
+        fetch('https://objetperduv2.herokuapp.com/api/user/alert', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(obj),
         })
-            .catch(error => {
-                console.error("c'est une erreur !!!", error);
-                Alert.alert("Error un problème est survenu")
+        .catch(error => {
+            console.error("c'est une erreur !!!", error);
+            Alert.alert("Error un problème est survenu")
+        })
+        .then((response) => response.json())
+            .then(responseJson => {
+              this.popupDialog.dismiss(() => {
+                  Alert.alert(
+                      `Alerte Programmée`,
+                      `On t'enverra un mail quand un objet correspondra à ta recherche`,
+                  )
+              })
             })
-            .then(res =>
-                this.popupDialog.dismiss(() => {
-                    Alert.alert(
-                        `Alerte Programmée`,
-                        `On t'enverra un mail quand un objet correspondra à ta recherche`,
-                    )
-                })
-            );
 
     }
 
