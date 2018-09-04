@@ -30,6 +30,9 @@ import PopupDialog, {DialogTitle, DialogButton} from "react-native-popup-dialog"
 import Expo from 'expo';
 import Prompt from 'react-native-prompt-crossplatform';
 
+import CalendarPicker from 'react-native-calendar-picker';
+
+
 type Props = {
     /* ... */
 };
@@ -585,11 +588,12 @@ class HomeScreen extends React.Component<Props, State> {
             obj.station = this.state.stationChoice[0]
         }
         if (!(this.state.natureChoice == undefined)) {
-            obj.natureObject = this.state.natureChoice[0]
+            obj.nature = this.state.natureChoice[0]
         }
         if (!(this.state.typeChoice == undefined)) {
-            obj.typeObject = this.state.typeChoice[0]
+            obj.type = this.state.typeChoice[0]
         }
+        console.log(obj);
 
         // POST
         fetch("https://objetperduv2.herokuapp.com/api/lost_object/", {
@@ -661,6 +665,7 @@ class HomeScreen extends React.Component<Props, State> {
         this.popupDialog.show();
         // finTest
     }
+
 
     // function pour rentrer son email
     signInWithYourEmail(): any {
