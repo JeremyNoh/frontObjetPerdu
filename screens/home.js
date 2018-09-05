@@ -510,6 +510,8 @@ class HomeScreen extends React.Component<Props, State> {
                     </View>
                 </Modal>
 
+
+
                 <Button
                     title="Nouvelle recherche"
                     buttonStyle={{backgroundColor: '#5CB85C'}}
@@ -518,13 +520,35 @@ class HomeScreen extends React.Component<Props, State> {
                     onPress={() => {
                         var page: number = 0;
                         var objeFound: array = [];
-                        this.setState({isCardInfo: false, page, objeFound});
+                        this.setState({stationChoice: undefined,typeChoice: undefined,natureChoice: undefined, page, objeFound});
                         this.setModalVisible(true);
                     }}
                 />
+              {  this.buttonAffiche()}
             </View>
         );
     }
+
+    // Code Ui permettant d'afficher  le bouton Affine ta recherche
+    buttonAffiche(){
+      if (this.state.typeChoice !== undefined) {
+        return(
+          <Button
+              title="Affine ta recherche "
+              buttonStyle={{backgroundColor: '#428BCA', marginTop : 10}}
+              titleStyle={{fontWeight: "700"}}
+              containerStyle={{marginTop: 20}}
+              onPress={() => {
+                  var page: number = 0;
+                  var objeFound: array = [];
+                  this.setState({isCardInfo: false, page, objeFound});
+                  this.setModalVisible(true);
+              }}
+          />
+        )
+      }
+    }
+
 
     //  Code UI permettant la creation d'alerte
     createAlert() {
