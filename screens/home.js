@@ -13,6 +13,7 @@ import {
     TouchableOpacity,
     ScrollView,
     TextInput,
+    AsyncStorage,
 } from "react-native";
 
 import {Text, Button, Card, Badge} from "react-native-elements";
@@ -83,8 +84,11 @@ class HomeScreen extends React.Component<Props, State> {
         };
     }
 
+
+
     // fetch pour récupérer les 3 infos de recherche
     componentWillMount(): any {
+      this.getInfoUserStorage()
         fetch("https://objetperduv2.herokuapp.com/api/lost_object/stations")
             .then(response => response.json())
             .then(responseJson => {
@@ -141,6 +145,23 @@ class HomeScreen extends React.Component<Props, State> {
             .catch(error => {
                 console.error(error);
             });
+    }
+    // stoke  dans un state
+    async getInfoUserStorage() {
+      try {
+        const result = await AsyncStorage.getItem("@User");
+        if (result) {
+          user = JSON.parse(result);
+          if (user.userEmail !== undefined) {
+            this.setState({ userEmail: user.userEmail });
+          }
+          if (user.isCardInfo !== undefined) {
+            this.setState({ isCardInfo: user.isCardInfo });
+          }
+        }
+      } catch (e) {
+        console.log(e);
+      }
     }
 
     // Debut navigationOptions
@@ -398,7 +419,14 @@ class HomeScreen extends React.Component<Props, State> {
                     }}
                     title="J'ai compris !"
                     onPress={() => {
-                        this.setState({isCardInfo: false});
+                        const user = {
+                          isCardInfo: false,
+                          userEmail : this.state.userEmail
+                        };
+                        const str = JSON.stringify(user);
+                        AsyncStorage.setItem("@User", str).then(() => {
+                          this.setState({isCardInfo: false});
+                        });
                     }}
                 />
             </Card>
@@ -545,6 +573,7 @@ class HomeScreen extends React.Component<Props, State> {
                     }}
                     onSubmit={() => {
                         if (this.emailVerif()) {
+                            this.setEmailStorage()
                             this.setState({writeEmail: false});
                         }
                         else {
@@ -620,6 +649,17 @@ class HomeScreen extends React.Component<Props, State> {
 
     }
 
+    // set email dans le loclaStorage
+    setEmailStorage(){
+      const user = {
+        isCardInfo: this.state.isCardInfo,
+        userEmail : this.state.userEmail,
+      };
+      const str = JSON.stringify(user);
+      AsyncStorage.setItem("@User", str).then(() => {
+      });
+    }
+
     // function pour se connecter via Facebook
     async signInWithFacebookAsync() {
         const {type, token} = await Expo.Facebook.logInWithReadPermissionsAsync('267723867174602', {
@@ -635,6 +675,7 @@ class HomeScreen extends React.Component<Props, State> {
                 `Bonjour ${userInfo.name}!`,
             );
         }
+        this.setEmailStorage()
     }
 
     // function pour se connecter via Google
@@ -662,6 +703,7 @@ class HomeScreen extends React.Component<Props, State> {
         }
         this.setModalVisible(true);
         this.popupDialog.show();
+        this.setEmailStorage()
     }
 
 
