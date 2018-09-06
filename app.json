@@ -1,6 +1,12 @@
 {
   "expo": {
     "sdkVersion": "27.0.0",
-    "facebookScheme":"fb267723867174602"
-  }
+    "facebookScheme":"fb267723867174602",
+    "splash": {
+     "image": "./assets/logo.png",
+     "resizeMode": "contain",
+     "backgroundColor": "#ffffff"
+   },
+  },
+
 }
