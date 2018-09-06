@@ -14,9 +14,10 @@ import {
     ScrollView,
     TextInput,
     AsyncStorage,
+    ActivityIndicator,
 } from "react-native";
 
-import {Text, Button, Card, Badge} from "react-native-elements";
+import {Text, Button, Card, Badge, Icon} from "react-native-elements";
 import {
     CardTitle,
     CardContent,
@@ -56,6 +57,7 @@ type State = {
     userEmail: string,
     userName: string,
     writeEmail: boolean,
+    loadingSpinner : boolean,
 };
 
 class HomeScreen extends React.Component<Props, State> {
@@ -81,13 +83,31 @@ class HomeScreen extends React.Component<Props, State> {
             userEmail: '',
             userName: '',
             writeEmail: false,
+            loadingSpinner : false,
         };
     }
 
 
+    // supprimer les items des loclaStorage // pour Test
+    // async removeItemValue() {
+    //   key = "@User"
+    //     try {
+    //       await AsyncStorage.removeItem(key);
+    //       return true;
+    //     }
+    //     catch(exception) {
+    //       return false;
+    //     }
+    //   }
+
+    AddAlert =() => {
+      this.setModalVisible(true);
+       console.log(this.popupDialog.show());
+    }
 
     // fetch pour récupérer les 3 infos de recherche
     componentWillMount(): any {
+      // this.removeItemValue()
       this.getInfoUserStorage()
         fetch("https://objetperduv2.herokuapp.com/api/lost_object/stations")
             .then(response => response.json())
@@ -175,7 +195,8 @@ class HomeScreen extends React.Component<Props, State> {
             },
             headerTitleStyle: {
                 color: "#fff"
-            }
+            },
+
         };
     };
 
@@ -307,7 +328,7 @@ class HomeScreen extends React.Component<Props, State> {
                     }
                     console.log("nombre de resultat : ", nbrObj);
                     console.log("Page total : ", PageMax);
-                    this.setState({objeFound, isSearchReady: true, PageMax, nbrObj});
+                    this.setState({objeFound, isSearchReady: true, PageMax, nbrObj,loadingSpinner : false});
 
 
                 } else {
@@ -316,15 +337,13 @@ class HomeScreen extends React.Component<Props, State> {
                     });
 
                     var objeFound: array = [];
-                    this.setState({objeFound, isSearchReady: true, PageMax: 0, nbrObj: 0});
+                    this.setState({objeFound, isSearchReady: true, PageMax: 0, nbrObj: 0,loadingSpinner : false});
                     console.log(responseJson.Error);
                 }
             })
             .catch(error => {
                 console.error(error);
             });
-        // ferme le spinner
-        // loading.close();
     }
 
     // Card sur la nature de l'objet
@@ -483,12 +502,14 @@ class HomeScreen extends React.Component<Props, State> {
                             {this.state.isStation && this.villeView()}
 
                             <Button
+                                disabled={!this.state.isAffine}
                                 title="Rechercher"
                                 titleStyle={{fontWeight: "700"}}
                                 buttonStyle={styles.buttonStyle}
                                 containerStyle={{marginTop: 20}}
                                 onPress={() => {
-                                    // loading.show();
+                                    // spinner.show();
+                                    this.setState({loadingSpinner : true})
                                     this.submit();
                                 }}
                             />
@@ -502,7 +523,6 @@ class HomeScreen extends React.Component<Props, State> {
                                 containerStyle={{marginTop: 20}}
                                 onPress={() => {
                                     this.popupDialog.show()
-                                    // this.setModalVisible(false);
                                 }}
                             />
                         </ScrollView>
@@ -520,7 +540,7 @@ class HomeScreen extends React.Component<Props, State> {
                     onPress={() => {
                         var page: number = 0;
                         var objeFound: array = [];
-                        this.setState({stationChoice: undefined,typeChoice: undefined,natureChoice: undefined, page, objeFound});
+                        this.setState({isCardInfo: false,stationChoice: undefined,typeChoice: undefined,natureChoice: undefined, page, objeFound, isAffine:false, isStation : false});
                         this.setModalVisible(true);
                     }}
                 />
@@ -528,6 +548,8 @@ class HomeScreen extends React.Component<Props, State> {
             </View>
         );
     }
+
+
 
     // Code Ui permettant d'afficher  le bouton Affine ta recherche
     buttonAffiche(){
@@ -541,14 +563,13 @@ class HomeScreen extends React.Component<Props, State> {
               onPress={() => {
                   var page: number = 0;
                   var objeFound: array = [];
-                  this.setState({isCardInfo: false, page, objeFound});
+                  this.setState({ page, objeFound});
                   this.setModalVisible(true);
               }}
           />
         )
       }
     }
-
 
     //  Code UI permettant la creation d'alerte
     createAlert() {
@@ -784,8 +805,8 @@ class HomeScreen extends React.Component<Props, State> {
             });
         }
         else {
-            // loading.show()
-            this.setState({page})
+            // show spinner
+            this.setState({page, loadingSpinner : true})
             this.submit()
         }
 
@@ -799,6 +820,9 @@ class HomeScreen extends React.Component<Props, State> {
                 {this.state.isSearchReady && this.nbrObjFound()}
                 {this.state.isSearchReady && this.ListObjFound()}
                 <Toast ref="toast" position='center' opacity={0.7}/>
+                <View style={styles.spinner}>
+                  <ActivityIndicator size="large" color="#0000ff" animating={this.state.loadingSpinner} />
+                </View>
             </View>
         );
     }
@@ -841,5 +865,11 @@ const styles = StyleSheet.create({
     cardTitle: {
         backgroundColor: "#fff",
         borderRadius: 5,
-    }
+    },
+      spinner: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+  },
 });
