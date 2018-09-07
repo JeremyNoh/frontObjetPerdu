@@ -9,9 +9,10 @@ Vous retrouvez içi l'Application à savoir le FRONT
 Le but de ce projet est de créer une Application mobile multi-platforme permettant la recherche d'un objet retrouvé de la SNCF
 
 Créer & réaliser par
-*  [Jeremy Nohile](http://jeremynohile.890m.com/)
 *  [Antoine françois](https://github.com/aawfrancois)
-*  [Sheik Nohile](https://github.com/Shein1)
+*  [Sheikh Rohman](https://github.com/Shein1)
+*  [Jeremy Nohile](http://jeremynohile.890m.com/)
+
 
 ## Fonctionnalité
 
